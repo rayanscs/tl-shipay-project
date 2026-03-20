@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 
-namespace TL.Shipay.Project.Api.Controllers
+namespace TL.Shipay.Project.Api.Controllers.v1
 {
     [ApiController]
-    [Route("api/clientes")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/clientes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public class ClientesController : ControllerBase
     {
         private readonly ILogger<ClientesController> _logger;

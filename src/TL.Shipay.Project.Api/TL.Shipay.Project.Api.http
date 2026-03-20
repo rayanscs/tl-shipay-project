@@ -1,6 +1,6 @@
 @TL.Shipay.Project.Api_HostAddress = http://localhost:5110
 
-GET {{TL.Shipay.Project.Api_HostAddress}}/weatherforecast/
+GET {{TL.Shipay.Project.Api_HostAddress}}/v1/cliente/
 Accept: application/json
 
 ###

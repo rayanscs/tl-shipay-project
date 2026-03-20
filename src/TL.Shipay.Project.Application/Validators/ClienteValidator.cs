@@ -1,0 +1,66 @@
+﻿using FluentValidation;
+using System.Text.RegularExpressions;
+
+namespace TL.Shipay.Project.Application.Validators
+{
+    public sealed class ClienteValidator : AbstractValidator<ClienteRequest>
+    {
+        public ClienteValidator()
+        {
+            // Validação do CNPJ
+            RuleFor(x => x.Cnpj)
+                .NotEmpty().WithMessage("O CNPJ é obrigatório.")
+                .MaximumLength(14).WithMessage("O CNPJ deve ter no máximo 14 caracteres.")
+                .Must(ValidarCnpj).WithMessage("O CNPJ informado é inválido.");
+
+            RuleFor(x => x.Cep)
+                .NotEmpty().WithMessage("O CEP é obrigatório.")
+                // Aceita o formato "00000000" ou "00000-000"
+                .Matches(@"^\d{5}-?\d{3}$").WithMessage("O formato do CEP é inválido.");
+        }
+
+        private bool ValidarCnpj(string cnpj)
+        {
+            if (string.IsNullOrWhiteSpace(cnpj))
+                return false;
+
+            // Remove a formatação (pontos, traços e barras)
+            cnpj = cnpj.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
+
+            // Verifica se tem 14 dígitos
+            if (cnpj.Length != 14)
+                return false;
+
+            // Rejeita CNPJs conhecidos que passam no cálculo mas são inválidos
+            if (cnpj == "00000000000000" || string.Join("", cnpj.Distinct()) == cnpj[0].ToString())
+                return false;
+
+            // Arrays com os multiplicadores do Módulo 11
+            int[] multiplicador1 = new int[12] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int[] multiplicador2 = new int[13] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+
+            // Calcula o primeiro dígito verificador
+            string tempCnpj = cnpj.Substring(0, 12);
+            int soma = 0;
+            for (int i = 0; i < 12; i++)
+                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador1[i];
+
+            int resto = (soma % 11);
+            resto = resto < 2 ? 0 : 11 - resto;
+            string digito = resto.ToString();
+            tempCnpj = tempCnpj + digito;
+
+            // Calcula o segundo dígito verificador
+            soma = 0;
+            for (int i = 0; i < 13; i++)
+                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador2[i];
+
+            resto = (soma % 11);
+            resto = resto < 2 ? 0 : 11 - resto;
+            digito = digito + resto.ToString();
+
+            // Verifica se os dígitos calculados batem com os digitados
+            return cnpj.EndsWith(digito);
+        }
+    }
+}
