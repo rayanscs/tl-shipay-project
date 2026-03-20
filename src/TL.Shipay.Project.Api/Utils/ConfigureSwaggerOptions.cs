@@ -30,7 +30,7 @@ namespace TL.Shipay.Project.Api.Utils
         {
             var info = new OpenApiInfo
             {
-                Title = "Minha API Versionada",
+                Title = "Shipay - TechLeader Test API",
                 Version = description.ApiVersion.ToString(),
                 Description = "Documentação interativa da API."
             };
