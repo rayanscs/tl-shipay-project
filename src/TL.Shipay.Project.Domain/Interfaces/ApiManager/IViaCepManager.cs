@@ -1,6 +1,6 @@
 ﻿using TL.Shipay.Project.Domain.Models.Http;
 
-namespace TL.Shipay.Project.Domain.Interfaces
+namespace TL.Shipay.Project.Domain.Interfaces.ApiManager
 {
     public interface IViaCepManager
     {

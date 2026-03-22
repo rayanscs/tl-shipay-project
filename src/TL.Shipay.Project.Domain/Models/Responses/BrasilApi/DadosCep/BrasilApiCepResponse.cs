@@ -2,7 +2,7 @@
 
 namespace TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCep
 {
-    internal class BrasilApiCepResponse
+    public class BrasilApiCepResponse
     {
         [JsonProperty("cep")]
         public string? Cep { get; set; }

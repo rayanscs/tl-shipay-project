@@ -7,15 +7,24 @@ namespace TL.Shipay.Project.Application.Validators
     {
         public ClienteValidator()
         {
-            // Validação do CNPJ
             RuleFor(x => x.Cnpj)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("O CNPJ é obrigatório.")
+                .Must(cnpj =>
+                {
+                    if (!Regex.IsMatch(cnpj, @"\p{L}"))
+                        return true;
+
+                    var agora = DateTime.Now;
+                    var limite = new DateTime(2026, 7, 1);
+                    return agora >= limite;
+                })
+                .WithMessage("Cnpj alfanumérico só pode ser utilizado a partir de jul-2026. Favor utilizar o padrão somente números.")
                 .MaximumLength(14).WithMessage("O CNPJ deve ter no máximo 14 caracteres.")
                 .Must(ValidarCnpj).WithMessage("O CNPJ informado é inválido.");
 
             RuleFor(x => x.Cep)
                 .NotEmpty().WithMessage("O CEP é obrigatório.")
-                // Aceita o formato "00000000" ou "00000-000"
                 .Matches(@"^\d{5}-?\d{3}$").WithMessage("O formato do CEP é inválido.");
         }
 
@@ -24,18 +33,14 @@ namespace TL.Shipay.Project.Application.Validators
             if (string.IsNullOrWhiteSpace(cnpj))
                 return false;
 
-            // Remove a formatação (pontos, traços e barras)
             cnpj = cnpj.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
 
-            // Verifica se tem 14 dígitos
             if (cnpj.Length != 14)
                 return false;
 
-            // Rejeita CNPJs conhecidos que passam no cálculo mas são inválidos
             if (cnpj == "00000000000000" || string.Join("", cnpj.Distinct()) == cnpj[0].ToString())
                 return false;
 
-            // Arrays com os multiplicadores do Módulo 11
             int[] multiplicador1 = new int[12] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
             int[] multiplicador2 = new int[13] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 

@@ -12,9 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TL.Shipay.Project.Application\TL.Shipay.Project.Application.csproj" />
-    <ProjectReference Include="..\TL.Shipay.Project.Domain\TL.Shipay.Project.Domain.csproj" />
-    <ProjectReference Include="..\TL.Shipay.Project.Infrastructure\TL.Shipay.Project.Infrastructure.csproj" />
+    <Folder Include="DependencyInjection\" />
   </ItemGroup>
 
 </Project>
