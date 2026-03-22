@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TL.Shipay.Project.Domain.Responses.BrasilApi.DadosCep
+namespace TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCep
 {
     public class Coordinates
     {

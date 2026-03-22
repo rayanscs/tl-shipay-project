@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -20,7 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TL.Shipay.Project.Application\TL.Shipay.Project.Application.csproj" />
-    <ProjectReference Include="..\TL.Shipay.Project.Domain\TL.Shipay.Project.Domain.csproj" />
+    <ProjectReference Include="..\TL.Shipay.Project.Infrastructure\TL.Shipay.Project.Infrastructure.csproj" />
+    <ProjectReference Include="..\TL.Shipay.Project.IoC\TL.Shipay.Project.IoC.csproj" />
   </ItemGroup>
 
 </Project>

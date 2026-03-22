@@ -1,16 +1,20 @@
 using Asp.Versioning;
 using FluentValidation;
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using TL.Shipay.Project.Api.Utils;
+using TL.Shipay.Project.Api.Extensions;
 using TL.Shipay.Project.Application.Validators;
+using TL.Shipay.Project.IoC.DependencyInjection;
+using TL.Shipay.Project.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddServices();
 
 builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ClienteValidator>();
+
+builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("ApiManagerUrl"));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

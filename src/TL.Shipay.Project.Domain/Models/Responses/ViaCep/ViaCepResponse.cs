@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TL.Shipay.Project.Domain.Responses.ViaCep
+namespace TL.Shipay.Project.Domain.Models.Responses.ViaCep
 {
     public class ViaCepResponse
     {

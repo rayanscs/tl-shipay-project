@@ -14,4 +14,9 @@
     <ProjectReference Include="..\TL.Shipay.Project.Domain\TL.Shipay.Project.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mappings\" />
+    <Folder Include="DTOs\" />
+  </ItemGroup>
+
 </Project>

@@ -1,19 +1,20 @@
 <Solution>
-  <Folder Name="/1-Presentation/">
+  <Folder Name="/1 - Presentation/">
     <Project Path="src/TL.Shipay.Project.Api/TL.Shipay.Project.Api.csproj" />
   </Folder>
-  <Folder Name="/2-Application/">
+  <Folder Name="/2 - Application/">
     <Project Path="src/TL.Shipay.Project.Application/TL.Shipay.Project.Application.csproj" Id="a36d8f95-e8f7-4e08-bf0c-b17278c1b512">
       <BuildDependency Project="src/TL.Shipay.Project.Domain/TL.Shipay.Project.Domain.csproj" />
     </Project>
   </Folder>
-  <Folder Name="/3-Domain/">
+  <Folder Name="/3 - Domain/">
     <Project Path="src/TL.Shipay.Project.Domain/TL.Shipay.Project.Domain.csproj" />
   </Folder>
-  <Folder Name="/4-Infrastructure/" />
-  <Folder Name="/5-Tests/">
-    <Project Path="src/TL.Shipay.Project.Testes/TL.Shipay.Project.Testes.csproj">
-      <BuildDependency Project="src/TL.Shipay.Project.Domain/TL.Shipay.Project.Domain.csproj" />
-    </Project>
+  <Folder Name="/4 - Infrastructure/">
+    <Project Path="src/TL.Shipay.Project.Infrastructure/TL.Shipay.Project.Infrastructure.csproj" Id="59e94ba5-f5fb-4fee-b362-6021d5f06be2" />
   </Folder>
+  <Folder Name="/5 - CrossCutting/">
+    <Project Path="src/TL.Shipay.Project.IoC/TL.Shipay.Project.IoC.csproj" Id="ba626497-df06-4dad-b168-c0221bb5a80b" />
+  </Folder>
+  <Folder Name="/6 - Tests/" />
 </Solution>

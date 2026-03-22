@@ -1,4 +1,5 @@
-﻿using TL.Shipay.Project.Domain.Responses;
+﻿using TL.Shipay.Project.Domain.Models.Http;
+using TL.Shipay.Project.Domain.Models.Responses;
 
 namespace TL.Shipay.Project.Application.Interfaces
 {

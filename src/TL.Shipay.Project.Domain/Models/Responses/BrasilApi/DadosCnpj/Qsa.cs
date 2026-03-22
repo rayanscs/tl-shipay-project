@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TL.Shipay.Project.Domain.Responses.BrasilApi.DadosCnpj
+namespace TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj
 {
     public class Qsa
     {
