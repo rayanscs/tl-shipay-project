@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj;
 
-namespace TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj
+namespace TL.Shipay.Project.Domain.Models
 {
-    public class BrasilApiCnpjResponse
+    public class DadosEmpresa
     {
         [JsonProperty("uf")]
         public string? Uf { get; set; }
@@ -146,6 +147,6 @@ namespace TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj
         public IEnumerable<Qsa>? Qsa { get; set; }
 
         [JsonProperty("cnaes_secundarios")]
-        public List<CnaesSecundario>? CnaesSecundarios { get; set; }
+        public IEnumerable<CnaesSecundario>? CnaesSecundarios { get; set; }
     }
 }

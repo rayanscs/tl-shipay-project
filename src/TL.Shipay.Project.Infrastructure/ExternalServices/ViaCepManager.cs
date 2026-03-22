@@ -38,7 +38,10 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 if (!httpResponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning($"Consulta ViaCep falhou. Cep: {cepLimpo} StatusCode: {httpResponse.StatusCode}");
-                    response.AddNotification(ECodeTypeLog.ViaCepError.Codigo(), ETitleLog.ViaCepErroConsulta.Texto(), $"Não foi possível obter o endereço para o CEP {cep}, {LogMessagesExtensions.TenteNovamenteMaisTarde()} ");
+                    response.AddNotification(ECodeTypeLog.ViaCepError.Codigo(), 
+                                             ETitleLog.ViaCepErroConsulta.Texto(), 
+                                             $"Não foi possível obter o endereço para o CEP {cep}, {LogMessagesExtensions.TenteNovamenteMaisTarde()}");
+                    
                     return response; 
                 }
 
@@ -47,8 +50,8 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 {
                     _logger.LogWarning($"Consulta ViaCep: Consulta do Cep retornou nula. Cep: {cepLimpo} StatusCode: {StatusCodes.Status404NotFound}");
                     response.AddNotification(ECodeTypeLog.ViaCepNotFound.Codigo(), 
-                                            ETitleLog.ViaCepErroConsulta.Texto(), 
-                                            $"Não foram encontrados os dados de endereço para o Cep {cep}, a consulta retornou vazia.");
+                                             ETitleLog.ViaCepErroConsulta.Texto(), 
+                                             $"Não foram encontrados os dados de endereço para o Cep {cep}, a consulta retornou vazia.");
                     
                     return response;   
                 }
@@ -67,6 +70,7 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 response.AddNotification(ECodeTypeLog.ViaCepExceptionError.Codigo(), 
                                          ETitleLog.ViaCepErroConsulta.Texto(), 
                                          $"Erro ao consultar o Cep {cep}, {LogMessagesExtensions.TenteNovamenteMaisTardeComSuporte()}");
+                
                 return response;
             }
         }

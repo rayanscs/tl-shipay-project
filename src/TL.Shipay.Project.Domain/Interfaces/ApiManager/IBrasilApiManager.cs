@@ -6,6 +6,6 @@ namespace TL.Shipay.Project.Domain.Interfaces.ApiManager
     {
         Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken);
 
-        Task<Response> ObterEnderecoBrasilApiAsync(string cep, CancellationToken cancellationToken);
+        Task<Response> ObterEnderecoPorCepBrasilApiAsync(string cep, CancellationToken cancellationToken);
     }
 }

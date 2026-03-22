@@ -3,18 +3,20 @@ using FluentValidation;
 using Swashbuckle.AspNetCore.Filters;
 using TL.Shipay.Project.Api.Extensions;
 using TL.Shipay.Project.Application.Validators;
-using TL.Shipay.Project.IoC.DependencyInjection;
 using TL.Shipay.Project.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddServices();
+builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("ApiManagerUrl"));
+builder.Services.Configure<ResilienciaConfig>(builder.Configuration.GetSection("ResilienciaConfig"));
 
+var configuration = builder.Configuration;
+
+builder.Services.AddServices();
+builder.Services.AddHttpClientFactory(configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ClienteValidator>();
-
-builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("ApiManagerUrl"));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

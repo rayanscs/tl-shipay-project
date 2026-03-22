@@ -13,13 +13,13 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
     public class BrasilApiManager : IBrasilApiManager
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<ViaCepManager> _logger;
+        private readonly ILogger<BrasilApiManager> _logger;
         private readonly ApiManagerUrlOptions _options;
         private readonly string _baseUrl;
         private readonly string _dadosCnpjUrl;
         private readonly string _dadosCepUrl;
 
-        public BrasilApiManager(HttpClient httpClient, ILogger<ViaCepManager> logger, ApiManagerUrlOptions options)
+        public BrasilApiManager(HttpClient httpClient, ILogger<BrasilApiManager> logger, ApiManagerUrlOptions options)
         {
             _httpClient = httpClient;
             _logger = logger;
@@ -46,7 +46,7 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                     return response;
                 }
 
-                var BrasilApiCnpj = await httpResponse.Content.ReadFromJsonAsync<BrasilApiCnpjResponse>(cancellationToken: cancellationToken);
+                var BrasilApiCnpj = await httpResponse.Content.ReadFromJsonAsync<DadosCnpjBrasilApiResponse>(cancellationToken: cancellationToken);
                 if (BrasilApiCnpj is null)
                 {
                     _logger.LogWarning($"Consulta BrasilApi: Consulta do Cnpj retornou nula. Cnpj: {cnpj} StatusCode: {StatusCodes.Status404NotFound}");
@@ -76,7 +76,7 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
             }
         }
 
-        public async Task<Response> ObterEnderecoBrasilApiAsync(string cep, CancellationToken cancellationToken)
+        public async Task<Response> ObterEnderecoPorCepBrasilApiAsync(string cep, CancellationToken cancellationToken)
         {
             var response = new Response();
 
@@ -117,8 +117,8 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
 
                 _logger.LogError(ex, $"Erro ao consultar BrasilApi. Status: {status} {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)}");
                 response.AddNotification(ECodeTypeLog.BrasilApiExceptionError.Codigo(),
-                    ETitleLog.BrasilApiErroConsultaCep.Texto(), 
-                    $"Erro ao consultar o Cep {cep}. Mensagem: {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)}) ");
+                                        ETitleLog.BrasilApiErroConsultaCep.Texto(), 
+                                        $"Erro ao consultar o Cep {cep}. Mensagem: {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)})");
                 
                 return response;
             }

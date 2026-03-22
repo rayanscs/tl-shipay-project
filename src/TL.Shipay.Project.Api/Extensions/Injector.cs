@@ -1,13 +1,15 @@
-﻿using TL.Shipay.Project.Application.Interfaces;
+﻿using System.Net;
+using TL.Shipay.Project.Application.Interfaces;
 using TL.Shipay.Project.Application.Services;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
+using TL.Shipay.Project.Domain.Interfaces.Services;
 using TL.Shipay.Project.Infrastructure.ExternalServices;
 
 namespace TL.Shipay.Project.Api.Extensions
 {
     public static class Injector
     {
-        public static IServiceCollection RegisterExternalServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddExternalServices(this IServiceCollection services, IConfiguration config)
         {
             services.AddScoped<IBrasilApiManager,BrasilApiManager>();
             services.AddScoped<IViaCepManager, ViaCepManager>();
@@ -17,12 +19,8 @@ namespace TL.Shipay.Project.Api.Extensions
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IBrasilApiService, BrasilApiService>();
-            services.AddScoped<IViaCepService, ViaCepService>();
-
+            services.AddScoped<IDadosEmpresaProvider, DadosEmpresaProvider>();
             return services;
-        }
-
-       
+        }  
     }
 }
