@@ -45,12 +45,16 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                     response.AddNotification(ECodeTypeLog.ViaCepError.Codigo(),
                                              ETitleLog.ViaCepErroConsulta.Texto(),
                                              $"Não foi possível obter o endereço para o CEP {cep}, {LogMessagesExtensions.TenteNovamenteMaisTarde()}");
-
+                    
+                    response.SetMensagemPrincipal($"{httpResponse.StatusCode}");
                     return response;
                 }
 
                 var viaCep = await httpResponse.Content.ReadFromJsonAsync<ViaCepResponse>(cancellationToken: cancellationToken);
-                if (viaCep is null)
+                if (viaCep == null 
+                    || string.IsNullOrWhiteSpace(viaCep.Cep.CepSomenteNumeros()) 
+                    || string.IsNullOrWhiteSpace(viaCep.Logradouro) 
+                    || string.IsNullOrWhiteSpace(viaCep.Localidade))
                 {
                     _logger.LogWarning($"Consulta ViaCep: Consulta do Cep retornou nula. Cep: {cepLimpo} StatusCode: {StatusCodes.Status404NotFound}");
                     response.AddNotification(ECodeTypeLog.ViaCepNotFound.Codigo(),

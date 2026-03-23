@@ -71,6 +71,10 @@ namespace TL.Shipay.Project.Application.Services
                 "ViaCep" => async () =>
                 {
                     var resp = await ObterEnderecoViaCepAsync(cep, cancellationToken);
+
+                    if ((resp.MensagemPrincipal.Contains("NotFound") || resp.MensagemPrincipal.Contains("404")))
+                        return resp;
+                    
                     if (!resp.Sucesso)
                     {
                         _logger.LogInformation("ViaCep falhou, chamando BrasilApi para fallback");
@@ -83,9 +87,9 @@ namespace TL.Shipay.Project.Application.Services
                         }
                         return fallback;
                     }
+
                     return resp;
-                }
-                ,
+                },
                 _ => async () =>
                 {
                     _logger.LogInformation($"{LogMessagesExtensions.SemConfiguracaoResiliencia()}");
