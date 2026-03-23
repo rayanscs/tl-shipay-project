@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using TL.Shipay.Project.Api.AppService.v1;
+﻿using TL.Shipay.Project.Api.AppService.v1;
 using TL.Shipay.Project.Api.AppService.v1.Interfaces;
 using TL.Shipay.Project.Application.Mappings;
 using TL.Shipay.Project.Application.Services;

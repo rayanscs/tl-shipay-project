@@ -58,7 +58,7 @@ if (app.Environment.IsDevelopment())
     .ForEach(
         description => options.SwaggerEndpoint(
             url: $"/swagger/{description.GroupName}/swagger.json",
-            name: description.GroupName.ToUpperInvariant()) )
+            name: description.GroupName.ToUpperInvariant()))
 );
     //app.UseSwaggerUI(c =>
     //{

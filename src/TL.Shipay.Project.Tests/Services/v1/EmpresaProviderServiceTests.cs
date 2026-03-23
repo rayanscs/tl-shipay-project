@@ -30,7 +30,8 @@ namespace TL.Shipay.Project.Tests.Services.v1
         {
             _resConfigMock.Setup(x => x.Value)
                 .Returns(new InfrastructureOptions
-                {   ResilienciaConfig = new ()
+                {
+                    ResilienciaConfig = new()
                     {
                         RetryCount = 3,
                         CircuitBreakerFailureRatio = 0.5,
@@ -42,7 +43,7 @@ namespace TL.Shipay.Project.Tests.Services.v1
                             ServicePrincipal = "BrasilApi"
                         }
                     }
-                   
+
                 });
 
             _empresaProviderService = new(

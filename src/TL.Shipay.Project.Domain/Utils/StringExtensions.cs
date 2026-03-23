@@ -24,7 +24,7 @@ namespace TL.Shipay.Project.Domain.Utils
         public static string NormalizaString(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return string.Empty;
-            
+
             var trimmed = s.Trim();
             var formD = trimmed.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();

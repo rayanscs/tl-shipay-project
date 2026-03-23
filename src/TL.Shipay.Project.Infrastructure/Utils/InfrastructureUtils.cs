@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace TL.Shipay.Project.Infrastructure.Utils
+﻿namespace TL.Shipay.Project.Infrastructure.Utils
 {
     public static class InfrastructureUtils
     {

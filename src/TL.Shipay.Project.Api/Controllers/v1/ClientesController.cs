@@ -10,7 +10,7 @@ namespace TL.Shipay.Project.Api.Controllers.v1
     [Produces("application/json")]
     public class ClientesController(ILogger<ClientesController> _logger, IClienteAppService _clienteAppService) : ControllerBase
     {
-        
+
 
         // POST api/<ClientesController>
         [HttpPost("validacao")]
