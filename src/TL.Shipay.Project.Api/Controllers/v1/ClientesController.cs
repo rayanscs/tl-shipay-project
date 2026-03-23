@@ -1,24 +1,30 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 using TL.Shipay.Project.Api.AppService.v1.Interfaces;
+using TL.Shipay.Project.Domain.Models.Http;
+using TL.Shipay.Project.Domain.Models.Request;
 
 namespace TL.Shipay.Project.Api.Controllers.v1
 {
-    [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/clientes")]
     [ApiController]
-    [Produces("application/json")]
+    [ApiVersion("1")]
+    [Route("api/v{version:apiVersion}/clientes")]
+    //[Produces("application/json")]
     public class ClientesController(ILogger<ClientesController> _logger, IClienteAppService _clienteAppService) : ControllerBase
     {
-
-
-        // POST api/<ClientesController>
+        /// <summary>
+        /// Efetua a verificação dos dados do cliente.
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de chamada: POST /api/v1/clientes/validacao
+        /// </remarks>
+        /// <returns>Validação se endereços se coicidem</returns>
         [HttpPost("validacao")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PostAsync([FromBody] ClienteRequest request, CancellationToken cancellationToken)
+        [SwaggerRequestExample(typeof(ClienteRequest), typeof(ClienteRequestSwaggerExample))]
+        public async Task<ActionResult<Response>> PostAsync([FromBody] ClienteRequest request, CancellationToken cancellationToken)
         {
             var result = await _clienteAppService.ProcessaValidacaoDadosEmpresaAsync(request.Cnpj, request.Cep, cancellationToken);
             if (!result.Sucesso)

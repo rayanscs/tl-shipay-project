@@ -59,11 +59,7 @@ if (app.Environment.IsDevelopment())
         description => options.SwaggerEndpoint(
             url: $"/swagger/{description.GroupName}/swagger.json",
             name: description.GroupName.ToUpperInvariant()))
-);
-    //app.UseSwaggerUI(c =>
-    //{
-    //    c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{c.}");
-    //});
+    );
 
     app.UseReDoc(options =>
     {

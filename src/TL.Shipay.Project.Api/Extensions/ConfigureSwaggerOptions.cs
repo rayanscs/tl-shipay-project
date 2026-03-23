@@ -13,7 +13,7 @@ namespace TL.Shipay.Project.Api.Extensions
                     name: description.GroupName,
                     info: new OpenApiInfo
                     {
-                        Title = $"{description.ApiVersion}",
+                        Title = $"Shipay Project API Test",
                         Version = description.ApiVersion.ToString(),
                     }
                 )

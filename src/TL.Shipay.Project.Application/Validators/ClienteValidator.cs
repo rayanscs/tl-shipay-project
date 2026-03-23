@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using System.Text.RegularExpressions;
+using TL.Shipay.Project.Domain.Models.Request;
 
 namespace TL.Shipay.Project.Application.Validators
 {
