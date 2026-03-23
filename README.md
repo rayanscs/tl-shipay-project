@@ -27,7 +27,7 @@ Demonstrar implementação de boas práticas e padrões de desenvolvimento em .N
 - **Mapeamento**: AutoMapper
 - **Resiliência**: Microsoft.Http.Resilience 
 - **Testes**:
--   xUnit
+  - xUnit
   - Bogus
   - Moq
   - AutoFixture
