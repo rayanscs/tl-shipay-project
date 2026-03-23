@@ -1,6 +1,6 @@
 ﻿using TL.Shipay.Project.Domain.Enums;
 
-namespace TL.Shipay.Project.Domain.ExtensionsMethods
+namespace TL.Shipay.Project.Domain.Utils
 {
     public static class LogMessagesExtensions
     {

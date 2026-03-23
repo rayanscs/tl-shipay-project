@@ -8,7 +8,7 @@ namespace TL.Shipay.Project.Api.Extensions
         public static IServiceCollection AddHttpClientFactory(this IServiceCollection services, IConfiguration configuration)
         {
             var infrastructureOptions = configuration.GetSection("InfrasctructureOptions").Get<InfrastructureOptions>()
-                ?? throw new InvalidOperationException("A sessão 'InfrasctructureOptions' não possui valores.");
+                ?? throw new InvalidOperationException("A sessão InfrasctructureOptions não possui valores.");
 
             services.AddHttpClient<BrasilApiManager>(client =>
             {
@@ -16,10 +16,10 @@ namespace TL.Shipay.Project.Api.Extensions
             }).AddStandardResilienceHandler(options =>
             {
                 options.Retry.MaxRetryAttempts = infrastructureOptions.ResilienciaConfig.RetryCount;
-                options.CircuitBreaker.FailureRatio = 0.5;         // 50% de falhas numa janela
-                options.CircuitBreaker.MinimumThroughput = 2;         // pelo menos 2 req durante a janela
-                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10); // janela de amostragem
-                options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);    // fica aberto 60s
+                options.CircuitBreaker.FailureRatio = infrastructureOptions.ResilienciaConfig.CircuitBreakerFailureRatio;         // 50% de falhas numa janela
+                options.CircuitBreaker.MinimumThroughput = infrastructureOptions.ResilienciaConfig.CircuitBreakerMinimumThroughput;         // pelo menos 2 req durante a janela
+                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(infrastructureOptions.ResilienciaConfig.CircuitBreakerSamplingDuration); // janela de amostragem
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(infrastructureOptions.ResilienciaConfig.CircuitBreakerBreakDuration);    // fica aberto 60s
             });
 
             services.AddHttpClient<ViaCepManager>(client =>
@@ -28,10 +28,10 @@ namespace TL.Shipay.Project.Api.Extensions
             }).AddStandardResilienceHandler(options =>
             {
                 options.Retry.MaxRetryAttempts = infrastructureOptions.ResilienciaConfig.RetryCount;
-                options.CircuitBreaker.FailureRatio = 0.5;         // 50% de falhas numa janela
-                options.CircuitBreaker.MinimumThroughput = 2;         // pelo menos 2 req durante a janela
-                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10); // janela de amostragem
-                options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);    // fica aberto 60s
+                options.CircuitBreaker.FailureRatio = infrastructureOptions.ResilienciaConfig.CircuitBreakerFailureRatio;         // 50% de falhas numa janela
+                options.CircuitBreaker.MinimumThroughput = infrastructureOptions.ResilienciaConfig.CircuitBreakerMinimumThroughput;         // pelo menos 2 req durante a janela
+                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(infrastructureOptions.ResilienciaConfig.CircuitBreakerSamplingDuration); // janela de amostragem
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(infrastructureOptions.ResilienciaConfig.CircuitBreakerBreakDuration);
             });
 
             return services;

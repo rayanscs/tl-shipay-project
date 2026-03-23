@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
-using TL.Shipay.Project.Domain.Interfaces;
 
 namespace TL.Shipay.Project.Domain.Models.Http
 {
-    public class Response : IResponse
+    public class Response
     {
         public object Data { get; private set; }
 
@@ -20,37 +19,37 @@ namespace TL.Shipay.Project.Domain.Models.Http
 
         public IReadOnlyCollection<Notification> Notifications => _notificacoes;
 
-        public IResponse AddNotification(string menssage)
+        public Response AddNotification(string menssage)
         {
             _notificacoes.Add(new Notification("", "", menssage));
             return this;
         }
 
-        public IResponse AddNotification(string codigo, string titulo, string menssage)
+        public Response AddNotification(string codigo, string titulo, string menssage)
         {
             _notificacoes.Add(new Notification(codigo, titulo, menssage));
             return this;
         }
 
-        public IResponse AddNotification(Notification notification)
+        public Response AddNotification(Notification notification)
         {
             _notificacoes.Add(notification);
             return this;
         }
 
-        public IResponse AddNotifications(IReadOnlyCollection<Notification> notifications)
+        public Response AddNotifications(IReadOnlyCollection<Notification> notifications)
         {
             _notificacoes.AddRange(notifications);
             return this;
         }
 
-        public IResponse AddNotifications(IList<Notification> notifications)
+        public Response AddNotifications(IList<Notification> notifications)
         {
             _notificacoes.AddRange(notifications);
             return this;
         }
 
-        public IResponse AddNotifications(ICollection<Notification> notifications)
+        public Response AddNotifications(ICollection<Notification> notifications)
         {
             _notificacoes.AddRange(notifications);
             return this;
@@ -61,7 +60,7 @@ namespace TL.Shipay.Project.Domain.Models.Http
             MensagemPrincipal = mensagemPrincipal;
         }
 
-        public IResponse SetData(object obj)
+        public Response SetData(object obj)
         {
             Data = obj;
             return this;

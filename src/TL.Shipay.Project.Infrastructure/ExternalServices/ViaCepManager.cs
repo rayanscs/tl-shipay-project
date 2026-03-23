@@ -2,11 +2,10 @@
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 using TL.Shipay.Project.Domain.Enums;
-using TL.Shipay.Project.Domain.ExtensionsMelthods;
-using TL.Shipay.Project.Domain.ExtensionsMethods;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
 using TL.Shipay.Project.Domain.Models.Http;
 using TL.Shipay.Project.Domain.Models.Responses.ViaCep;
+using TL.Shipay.Project.Domain.Utils;
 
 namespace TL.Shipay.Project.Infrastructure.ExternalServices
 {

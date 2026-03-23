@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TL.Shipay.Project.Domain.ExtensionsMelthods
+namespace TL.Shipay.Project.Domain.Utils
 {
     public static class StringExtensions
     {

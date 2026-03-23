@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace TL.Shipay.Project.Domain.ExtensionsMelthods
+namespace TL.Shipay.Project.Domain.Utils
 {
     public static class EnumExtensions
     {

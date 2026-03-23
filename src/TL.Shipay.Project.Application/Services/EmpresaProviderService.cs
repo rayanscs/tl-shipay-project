@@ -3,24 +3,23 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using TL.Shipay.Project.Domain.Enums;
-using TL.Shipay.Project.Domain.ExtensionsMelthods;
-using TL.Shipay.Project.Domain.ExtensionsMethods;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
 using TL.Shipay.Project.Domain.Interfaces.Services;
 using TL.Shipay.Project.Domain.Models;
 using TL.Shipay.Project.Domain.Models.Http;
 using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCep;
 using TL.Shipay.Project.Domain.Models.Responses.ViaCep;
+using TL.Shipay.Project.Domain.Utils;
 using TL.Shipay.Project.Infrastructure;
 using TL.Shipay.Project.Infrastructure.Utils;
 
 namespace TL.Shipay.Project.Application.Services
 {
-    public class DadosEmpresaProvider(IBrasilApiManager _brasilApiManager,
+    public class EmpresaProviderService(IBrasilApiManager _brasilApiManager,
                                       IViaCepManager _viaCepManager,
                                       IOptions<InfrastructureOptions> _resConfig,
-                                      ILogger<DadosEmpresaProvider> _logger,
-                                      IMapper _mapper) : IDadosEmpresaProvider
+                                      ILogger<EmpresaProviderService> _logger,
+                                      IMapper _mapper) : IEmpresaProviderService
     {
         private async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
             => await _brasilApiManager.ObterDadosEmpresaBrasilApiAsync(cnpj, cancellationToken);

@@ -4,7 +4,7 @@ using TL.Shipay.Project.Domain.Models.Http;
 
 namespace TL.Shipay.Project.Api.AppService.v1
 {
-    public sealed class ClienteAppService(IDadosEmpresaProvider _provider) : IClienteAppService
+    public sealed class ClienteAppService(IEmpresaProviderService _provider) : IClienteAppService
     {
         public async Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken)
         {

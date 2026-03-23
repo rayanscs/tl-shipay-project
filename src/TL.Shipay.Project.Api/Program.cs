@@ -14,6 +14,7 @@ var configuration = builder.Configuration;
 
 builder.Services.AddAppServices();
 builder.Services.AddServices();
+builder.Services.AddMapperProfiles();
 builder.Services.AddHttpClientFactory(configuration);
 builder.Services.AddControllers();
 
@@ -53,8 +54,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        // Set the Swagger UI to be at the app's root URL (optional)
-        // c.RoutePrefix = string.Empty; 
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shipay TechLeader Test");
     });
 

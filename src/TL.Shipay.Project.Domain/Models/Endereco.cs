@@ -1,4 +1,4 @@
-﻿using TL.Shipay.Project.Domain.ExtensionsMelthods;
+﻿using TL.Shipay.Project.Domain.Utils;
 
 namespace TL.Shipay.Project.Domain.Models
 {

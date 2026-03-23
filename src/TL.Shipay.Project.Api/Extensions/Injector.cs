@@ -1,5 +1,7 @@
-﻿using TL.Shipay.Project.Api.AppService.v1;
+﻿using AutoMapper;
+using TL.Shipay.Project.Api.AppService.v1;
 using TL.Shipay.Project.Api.AppService.v1.Interfaces;
+using TL.Shipay.Project.Application.Mappings;
 using TL.Shipay.Project.Application.Services;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
 using TL.Shipay.Project.Domain.Interfaces.Services;
@@ -13,7 +15,6 @@ namespace TL.Shipay.Project.Api.Extensions
         {
             services.AddScoped<IBrasilApiManager, BrasilApiManager>();
             services.AddScoped<IViaCepManager, ViaCepManager>();
-
             return services;
         }
 
@@ -25,13 +26,18 @@ namespace TL.Shipay.Project.Api.Extensions
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IDadosEmpresaProvider, DadosEmpresaProvider>();
+            services.AddScoped<IEmpresaProviderService, EmpresaProviderService>();
             return services;
         }
 
-        public static IServiceCollection AddMapperInjector(this IServiceCollection services)
+        public static IServiceCollection AddMapperProfiles(this IServiceCollection services)
         {
-            services.AddScoped<IDadosEmpresaProvider, DadosEmpresaProvider>();
+            services.AddAutoMapper(mapperConfigurationExpression =>
+            {
+                mapperConfigurationExpression.AddProfile(typeof(DadosEmpresaMappings));
+                mapperConfigurationExpression.AddProfile(typeof(EnderecoBrasilApiMappings));
+                mapperConfigurationExpression.AddProfile(typeof(EnderecoViaCepMappings));
+            });
             return services;
         }
     }
