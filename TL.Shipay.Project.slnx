@@ -16,5 +16,7 @@
   <Folder Name="/5 - CrossCutting/">
     <Project Path="src/TL.Shipay.Project.IoC/TL.Shipay.Project.IoC.csproj" Id="ba626497-df06-4dad-b168-c0221bb5a80b" />
   </Folder>
-  <Folder Name="/6 - Tests/" />
+  <Folder Name="/6 - Tests/">
+    <Project Path="src/TL.Shipay.Project.Tests/TL.Shipay.Project.Tests.csproj" Id="6a6e5f2c-b62d-4da9-9ba9-765900f7b520" />
+  </Folder>
 </Solution>

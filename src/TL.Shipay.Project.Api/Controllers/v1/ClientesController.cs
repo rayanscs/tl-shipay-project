@@ -1,7 +1,5 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections;
-using System.Text;
 using TL.Shipay.Project.Api.AppService.v1.Interfaces;
 
 namespace TL.Shipay.Project.Api.Controllers.v1
