@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Text;
@@ -18,20 +19,22 @@ using TL.Shipay.Project.Infrastructure.Utils;
 
 namespace TL.Shipay.Project.Application.Services
 {
-    public class DadosEmpresaProvider(IBrasilApiManager _brasilApiManager, IViaCepManager _viaCepManager, IOptions<ResilienciaConfig> _resConfig, ILogger<DadosEmpresaProvider> _logger) : IDadosEmpresaProvider
+    public class DadosEmpresaProvider(IBrasilApiManager _brasilApiManager, 
+                                      IViaCepManager _viaCepManager, 
+                                      IOptions<ResilienciaConfig> _resConfig, 
+                                      ILogger<DadosEmpresaProvider> _logger, 
+                                      IMapper _mapper) : IDadosEmpresaProvider
     {
-
-
-        public async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
+        private async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
             => await _brasilApiManager.ObterDadosEmpresaBrasilApiAsync(cnpj, cancellationToken);
 
-        public async Task<Response> ObterEnderecoPorCepBrasilApiAsync(string cep, CancellationToken cancellationToken)
+        private async Task<Response> ObterEnderecoPorCepBrasilApiAsync(string cep, CancellationToken cancellationToken)
             => await _brasilApiManager.ObterEnderecoPorCepBrasilApiAsync(cep, cancellationToken);
 
-        public async Task<Response> ObterEnderecoViaCepAsync(string cep, CancellationToken cancellationToken)
+        private async Task<Response> ObterEnderecoViaCepAsync(string cep, CancellationToken cancellationToken)
            => await _viaCepManager.ObterEnderecoViaCepAsync(cep, cancellationToken);
 
-        public async Task<Response> ObterEnderecoPorCepAsync(string cep, string? resPrincipal, CancellationToken cancellationToken)
+        private async Task<Response> ObterEnderecoPorCepAsync(string cep, string? resPrincipal, CancellationToken cancellationToken)
         {
             Func<Task<Response>> execute = resPrincipal switch
             {
@@ -83,24 +86,20 @@ namespace TL.Shipay.Project.Application.Services
             return await execute();
         }
 
-        public static bool ValidaMatchEnderecos(DadosEmpresa empresa, Endereco endereco)
+        private static bool ValidaMatchEnderecos(DadosEmpresa empresa, Endereco endereco)
         {
             var municipioMatch = string.Equals(StringExtensions.NormalizaString(empresa.Municipio), StringExtensions.NormalizaString(endereco.Cidade), StringComparison.Ordinal);
             var logradouroMatch = string.Equals(StringExtensions.NormalizaString(empresa.Logradouro), StringExtensions.NormalizaString(endereco.Logradouro), StringComparison.Ordinal);
-
-            return municipioMatch && logradouroMatch;
-           
+            return municipioMatch && logradouroMatch;    
         }
 
         public async Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken)
         {
             var dadosEmpresaResponse = await ObterDadosEmpresaBrasilApiAsync(cnpj, cancellationToken);
             if (!dadosEmpresaResponse.Sucesso)
-            { }
+                 return dadosEmpresaResponse;
 
-            //Colocar uma Mapper aqui - Converter dados da empresa para um objeto mais limpo.
-            //var dadosEmpresa = Mapper.Map<DadosCnpjBrasilApiResponse>(dadosEmpresaResponse);
-            var dadosEmpresa = dadosEmpresaResponse.GetDataJson<DadosCnpjBrasilApiResponse>();
+            DadosEmpresa dadosEmpresa = _mapper.Map<DadosEmpresa>(dadosEmpresaResponse);
 
             var resPrincipal = InfrastructureExtensions.ObterServicoPrincipal(_resConfig);
             var enderecoResponse = await ObterEnderecoPorCepAsync(cep, resPrincipal, cancellationToken);
@@ -116,30 +115,29 @@ namespace TL.Shipay.Project.Application.Services
             if (servicoUtilizando == EResilienciaServico.BrasilApi)
             {
                 var obj = JsonConvert.DeserializeObject<BrasilApiCepResponse>(json);
-                //endereço = Mapper.Map<Endereco>(obj);
+                endereco = _mapper.Map<Endereco>(obj);
 
             }
             else if (servicoUtilizando == EResilienciaServico.ViaCep)
             {
                 var obj = JsonConvert.DeserializeObject<ViaCepResponse>(json);
-                //endereço = Mapper.Map<Endereco>(obj);
+                endereco = _mapper.Map<Endereco>(obj);
             }
 
+            var response = new Response();
 
             if (ValidaMatchEnderecos(dadosEmpresa, endereco))
             {
-                var response = new Response();
-                response.AddNotification(ECodeTypeLog.ValidacaoSucesso.Codigo(), ETitleLog.ValidacaoSucesso.Texto(), LogMessagesExtensions.DadosEmpresaValidadosComSucesso());
-                return response;
+                _logger.LogInformation($"{ETitleLog.ValidacaoDadosSucesso.Texto()}");
+                response.MensagemPrincipal = $"{LogMessagesExtensions.InformacoesCoincidem}";
             }
             else
             {
-                var response = new Response();
-                response.AddNotification(ECodeTypeLog.ValidacaoFalhou.Codigo(), ETitleLog.ValidacaoFalhou.Texto(), LogMessagesExtensions.DadosEmpresaNaoConferem());
-                return response;
+                _logger.LogInformation($"{LogMessagesExtensions.InformacoesNaoCoincidem()}");
+                response.AddNotification(ECodeTypeLog.DataValidateFail.Codigo(), ETitleLog.ValidacaoDadosFalha.Texto(), LogMessagesExtensions.InformacoesNaoCoincidem());
             }
+
+            return response;
         }
-
-
     }
 }

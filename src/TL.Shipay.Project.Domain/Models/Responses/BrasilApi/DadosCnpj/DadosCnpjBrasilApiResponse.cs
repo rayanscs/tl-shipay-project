@@ -147,11 +147,5 @@ namespace TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj
 
         [JsonProperty("cnaes_secundarios")]
         public IEnumerable<CnaesSecundario>? CnaesSecundarios { get; set; }
-
-        //public DadosCnpjBrasilApiResponse()
-        //{
-        //    Qsa = new List<Qsa>();
-        //    CnaesSecundarios = new List<CnaesSecundario>();
-        //}
     }
 }

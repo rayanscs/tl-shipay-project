@@ -11,6 +11,8 @@
         ViaCepNotFound,
         ViaCepExceptionError,
         BrasilApiFallbackFail,
-        ViaCepFallbackFail
+        ViaCepFallbackFail,
+        DataValidateFail,
+        DataValidadeSuccess
     }
 }

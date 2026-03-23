@@ -7,6 +7,8 @@
         BrasilApiErroConsultaCep,
         ViaCepErroConsulta,
         BrasilApiErroFallback,
-        ViaCepErroFallback
+        ViaCepErroFallback,
+        ValidacaoDadosFalha,
+        ValidacaoDadosSucesso
     }
 }

@@ -9,11 +9,11 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             ? message
             : $"{message} - {detalhe}";
 
-        public static string TenteNovamenteMaisTardeComSuporte() => "tente novamente mais tarde ou contate o suporte para maiores informações.";
-        
-        public static string TenteNovamenteMaisTarde() => "tente novamente mais tarde.";
-
-        public static string SemConfiguracaoResiliencia() => "Não foi definido uma configuração de resiliência para chamadas. Não cosneguimos prosseguir.";
+        public static string TenteNovamenteMaisTardeComSuporte() => "Tente novamente mais tarde ou contate o suporte para maiores informações.";
+        public static string TenteNovamenteMaisTarde() => "Tente novamente mais tarde.";
+        public static string SemConfiguracaoResiliencia() => "Não foi definido uma configuração de resiliência para chamadas. Não conseguimos prosseguir.";
+        public static string InformacoesNaoCoincidem() => "Infelizmente, a cidade ou o logradouro não são coincidem.";
+        public static string InformacoesCoincidem() => "Sucesso!! As informações coincidem.";
 
         public static string Codigo(this ECodeTypeLog key) =>
         key switch
@@ -27,6 +27,8 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             ECodeTypeLog.ViaCepExceptionError => "ViaCepExceptionError",
             ECodeTypeLog.BrasilApiFallbackFail => "BrasilApiFallbackFail",
             ECodeTypeLog.ViaCepFallbackFail => "ViaCepFallbackFail",
+            ECodeTypeLog.DataValidateFail => "DataValidateFail",
+            ECodeTypeLog.DataValidadeSuccess => "DataValidadeSuccess",
             _ => ""
         };
 
@@ -38,6 +40,8 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             ETitleLog.BrasilApiErroConsultaCep => "Erro na consulta BrasilApi Cep",
             ETitleLog.BrasilApiErroFallback => "Erro na consulta BrasilApi Cnpj",
             ETitleLog.ViaCepErroFallback => "Erro na consulta BrasilApi Cep",
+            ETitleLog.ValidacaoDadosFalha => "Informações não foram validadas com sucesso.",
+            ETitleLog.ValidacaoDadosSucesso => "Informações validadas com sucesso",
             _ => ""
         };
     }

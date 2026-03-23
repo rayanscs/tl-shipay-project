@@ -4,6 +4,6 @@ namespace TL.Shipay.Project.Domain.Interfaces.Services
 {
     public interface IDadosEmpresaProvider
     {
-        Task<Response> ObterEnderecoPorCepAsync(string cep, CancellationToken cancellationToken);
+        Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken);
     }
 }

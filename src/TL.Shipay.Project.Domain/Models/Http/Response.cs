@@ -7,7 +7,7 @@ namespace TL.Shipay.Project.Domain.Models.Http
     {
         public object Data { get; private set; }
 
-        public string MensagemPrincipal { get; private set; }
+        public string MensagemPrincipal { get; set; }
 
         private readonly List<Notification> _notificacoes;
 
