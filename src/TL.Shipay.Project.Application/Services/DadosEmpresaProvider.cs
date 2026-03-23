@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Text;
 using TL.Shipay.Project.Domain.Enums;
 using TL.Shipay.Project.Domain.ExtensionsMelthods;
 using TL.Shipay.Project.Domain.ExtensionsMethods;
@@ -11,10 +10,8 @@ using TL.Shipay.Project.Domain.Interfaces.Services;
 using TL.Shipay.Project.Domain.Models;
 using TL.Shipay.Project.Domain.Models.Http;
 using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCep;
-using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj;
 using TL.Shipay.Project.Domain.Models.Responses.ViaCep;
 using TL.Shipay.Project.Infrastructure;
-using TL.Shipay.Project.Infrastructure.ExternalServices;
 using TL.Shipay.Project.Infrastructure.Utils;
 
 namespace TL.Shipay.Project.Application.Services

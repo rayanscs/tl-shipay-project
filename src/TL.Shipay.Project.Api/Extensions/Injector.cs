@@ -21,6 +21,12 @@ namespace TL.Shipay.Project.Api.Extensions
         {
             services.AddScoped<IDadosEmpresaProvider, DadosEmpresaProvider>();
             return services;
-        }  
+        }
+
+        public static IServiceCollection AddMapperInjector(this IServiceCollection services)
+        {
+            services.AddScoped<IDadosEmpresaProvider, DadosEmpresaProvider>();
+            return services;
+        }
     }
 }
