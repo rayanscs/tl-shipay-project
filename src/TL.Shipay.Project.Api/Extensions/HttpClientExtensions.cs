@@ -8,8 +8,8 @@ namespace TL.Shipay.Project.Api.Extensions
     {
         public static IServiceCollection AddHttpClientFactory(this IServiceCollection services, IConfiguration configuration)
         {
-            var infrastructureOptions = configuration.GetSection("InfrasctructureOptions").Get<InfrastructureOptions>()
-                ?? throw new InvalidOperationException("A sessão InfrasctructureOptions não possui valores.");
+            var infrastructureOptions = configuration.GetSection("InfrastructureOptions").Get<InfrastructureOptions>()
+                ?? throw new InvalidOperationException("A sessão InfrastructureOptions não possui valores.");
 
             services.AddHttpClient<IBrasilApiManager, BrasilApiManager>(client =>
             {

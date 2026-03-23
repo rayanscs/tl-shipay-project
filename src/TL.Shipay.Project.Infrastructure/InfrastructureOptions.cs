@@ -8,7 +8,7 @@
 
     public class ResilienciaConfig
     {
-        public ServicoResilienciaConfig? Services { get; set; }
+        public ServicoResilienciaConfig Services { get; set; }
         public int RetryCount { get; set; }
         public double CircuitBreakerFailureRatio { get; set; }
         public int CircuitBreakerMinimumThroughput { get; set; }
@@ -23,7 +23,7 @@
 
     public class ServicoResilienciaConfig
     {
-        public string ServicePrincipal { get; set; } = string.Empty;
-        public string ServiceFallback { get; set; } = string.Empty;
+        public string ServicePrincipal { get; set; }
+        public string ServiceFallback { get; set; }
     }
 }
