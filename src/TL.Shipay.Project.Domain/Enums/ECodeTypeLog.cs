@@ -9,6 +9,8 @@
         BrasilApiExceptionError,
         ViaCepError,
         ViaCepNotFound,
-        ViaCepExceptionError
+        ViaCepExceptionError,
+        BrasilApiFallbackFail,
+        ViaCepFallbackFail
     }
 }

@@ -13,6 +13,8 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
         
         public static string TenteNovamenteMaisTarde() => "tente novamente mais tarde.";
 
+        public static string SemConfiguracaoResiliencia() => "Não foi definido uma configuração de resiliência para chamadas. Não cosneguimos prosseguir.";
+
         public static string Codigo(this ECodeTypeLog key) =>
         key switch
         {
@@ -23,6 +25,8 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             ECodeTypeLog.ViaCepError => "ViaCepError",
             ECodeTypeLog.ViaCepNotFound => "ViaCepNotFound",
             ECodeTypeLog.ViaCepExceptionError => "ViaCepExceptionError",
+            ECodeTypeLog.BrasilApiFallbackFail => "BrasilApiFallbackFail",
+            ECodeTypeLog.ViaCepFallbackFail => "ViaCepFallbackFail",
             _ => ""
         };
 
@@ -32,6 +36,8 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             ETitleLog.ViaCepErroConsulta => "Erro na consulta ViaCep",
             ETitleLog.BrasilApiErroConsultaCnpj => "Erro na consulta BrasilApi Cnpj",
             ETitleLog.BrasilApiErroConsultaCep => "Erro na consulta BrasilApi Cep",
+            ETitleLog.BrasilApiErroFallback => "Erro na consulta BrasilApi Cnpj",
+            ETitleLog.ViaCepErroFallback => "Erro na consulta BrasilApi Cep",
             _ => ""
         };
     }

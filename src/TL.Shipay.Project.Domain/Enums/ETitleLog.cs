@@ -5,6 +5,8 @@
         None = 0,
         BrasilApiErroConsultaCnpj,
         BrasilApiErroConsultaCep,
-        ViaCepErroConsulta
+        ViaCepErroConsulta,
+        BrasilApiErroFallback,
+        ViaCepErroFallback
     }
 }
