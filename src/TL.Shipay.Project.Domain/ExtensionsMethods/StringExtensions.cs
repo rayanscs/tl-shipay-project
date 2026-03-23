@@ -24,14 +24,17 @@ namespace TL.Shipay.Project.Domain.ExtensionsMelthods
         public static string NormalizaString(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+            
             var trimmed = s.Trim();
             var formD = trimmed.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();
+
             foreach (var ch in formD)
             {
                 var uc = CharUnicodeInfo.GetUnicodeCategory(ch);
                 if (uc != UnicodeCategory.NonSpacingMark) sb.Append(ch);
             }
+
             return sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant();
         }
     }

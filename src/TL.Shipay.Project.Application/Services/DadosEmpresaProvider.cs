@@ -18,7 +18,7 @@ namespace TL.Shipay.Project.Application.Services
 {
     public class DadosEmpresaProvider(IBrasilApiManager _brasilApiManager,
                                       IViaCepManager _viaCepManager,
-                                      IOptions<InfrasctructureOptions> _resConfig,
+                                      IOptions<InfrastructureOptions> _resConfig,
                                       ILogger<DadosEmpresaProvider> _logger,
                                       IMapper _mapper) : IDadosEmpresaProvider
     {
@@ -83,11 +83,11 @@ namespace TL.Shipay.Project.Application.Services
             return await execute();
         }
 
-        private static bool ValidaMatchEnderecos(DadosEmpresa empresa, Endereco endereco)
+        private async Task<bool> ValidaMatchEnderecos(DadosEmpresa empresa, Endereco endereco)
         {
             var municipioMatch = string.Equals(StringExtensions.NormalizaString(empresa.Municipio), StringExtensions.NormalizaString(endereco.Cidade), StringComparison.Ordinal);
             var logradouroMatch = string.Equals(StringExtensions.NormalizaString(empresa.Logradouro), StringExtensions.NormalizaString(endereco.Logradouro), StringComparison.Ordinal);
-            return municipioMatch && logradouroMatch;
+            return await Task.FromResult(municipioMatch && logradouroMatch);
         }
 
         public async Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken)
@@ -98,7 +98,7 @@ namespace TL.Shipay.Project.Application.Services
 
             DadosEmpresa dadosEmpresa = _mapper.Map<DadosEmpresa>(dadosEmpresaResponse);
 
-            var resPrincipal = InfrastructureExtensions.ObterServicoPrincipal(_resConfig);
+            var resPrincipal = InfrastructureUtils.ObterServicoPrincipal(_resConfig);
             var enderecoResponse = await ObterEnderecoPorCepAsync(cep, resPrincipal, cancellationToken);
             if (!enderecoResponse.Sucesso)
                 return enderecoResponse;
@@ -123,10 +123,10 @@ namespace TL.Shipay.Project.Application.Services
 
             var response = new Response();
 
-            if (ValidaMatchEnderecos(dadosEmpresa, endereco))
+            if (await ValidaMatchEnderecos(dadosEmpresa, endereco))
             {
                 _logger.LogInformation($"{ETitleLog.ValidacaoDadosSucesso.Texto()}");
-                response.MensagemPrincipal = $"{LogMessagesExtensions.InformacoesCoincidem}";
+                response.MensagemPrincipal = $"{LogMessagesExtensions.InformacoesCoincidem()}";
             }
             else
             {

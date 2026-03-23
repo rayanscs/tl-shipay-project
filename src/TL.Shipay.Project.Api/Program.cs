@@ -7,11 +7,12 @@ using TL.Shipay.Project.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("RouteOptions"));
-builder.Services.Configure<InfrasctructureOptions>(builder.Configuration.GetSection("ResilienciaConfig"));
+builder.Services.Configure<RouteOptions>(builder.Configuration.GetSection("RouteOptions"));
+builder.Services.Configure<InfrastructureOptions>(builder.Configuration.GetSection("InfrastructureOptions"));
 
 var configuration = builder.Configuration;
 
+builder.Services.AddAppServices();
 builder.Services.AddServices();
 builder.Services.AddHttpClientFactory(configuration);
 builder.Services.AddControllers();

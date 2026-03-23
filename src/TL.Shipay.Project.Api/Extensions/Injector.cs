@@ -1,4 +1,6 @@
-﻿using TL.Shipay.Project.Application.Services;
+﻿using TL.Shipay.Project.Api.AppService.v1;
+using TL.Shipay.Project.Api.AppService.v1.Interfaces;
+using TL.Shipay.Project.Application.Services;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
 using TL.Shipay.Project.Domain.Interfaces.Services;
 using TL.Shipay.Project.Infrastructure.ExternalServices;
@@ -12,6 +14,12 @@ namespace TL.Shipay.Project.Api.Extensions
             services.AddScoped<IBrasilApiManager, BrasilApiManager>();
             services.AddScoped<IViaCepManager, ViaCepManager>();
 
+            return services;
+        }
+
+        public static IServiceCollection AddAppServices(this IServiceCollection services)
+        {
+            services.AddScoped<IClienteAppService, ClienteAppService>();
             return services;
         }
 

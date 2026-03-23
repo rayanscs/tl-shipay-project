@@ -7,15 +7,15 @@ namespace TL.Shipay.Project.Api.Extensions
     {
         public static IServiceCollection AddHttpClientFactory(this IServiceCollection services, IConfiguration configuration)
         {
-            var apiManagerUrlOptions = configuration.GetSection("ResilienciaConfig").Get<InfrasctructureOptions>()
-                ?? throw new InvalidOperationException("A sessão 'ResilienciaConfig' não possui valores.");
+            var infrastructureOptions = configuration.GetSection("InfrasctructureOptions").Get<InfrastructureOptions>()
+                ?? throw new InvalidOperationException("A sessão 'InfrasctructureOptions' não possui valores.");
 
             services.AddHttpClient<BrasilApiManager>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddStandardResilienceHandler(options =>
             {
-                options.Retry.MaxRetryAttempts = apiManagerUrlOptions.ResilienciaConfig.RetryCount;
+                options.Retry.MaxRetryAttempts = infrastructureOptions.ResilienciaConfig.RetryCount;
                 options.CircuitBreaker.FailureRatio = 0.5;         // 50% de falhas numa janela
                 options.CircuitBreaker.MinimumThroughput = 2;         // pelo menos 2 req durante a janela
                 options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10); // janela de amostragem
@@ -27,7 +27,11 @@ namespace TL.Shipay.Project.Api.Extensions
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddStandardResilienceHandler(options =>
             {
-                options.Retry.MaxRetryAttempts = apiManagerUrlOptions.ResilienciaConfig.RetryCount;
+                options.Retry.MaxRetryAttempts = infrastructureOptions.ResilienciaConfig.RetryCount;
+                options.CircuitBreaker.FailureRatio = 0.5;         // 50% de falhas numa janela
+                options.CircuitBreaker.MinimumThroughput = 2;         // pelo menos 2 req durante a janela
+                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(10); // janela de amostragem
+                options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);    // fica aberto 60s
             });
 
             return services;
