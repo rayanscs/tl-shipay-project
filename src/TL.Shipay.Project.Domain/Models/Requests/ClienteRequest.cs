@@ -7,13 +7,6 @@ public class ClienteRequest
         this.Cep = Cep;
     }
 
-    public ClienteRequest(string Cnpj)
-    {
-        this.Cnpj = Cnpj;
-    }
-
     public string Cnpj { get; set; }
     public string Cep { get; set; }
 }
-
-public record ClienteRequestSwaggerExample(string Cnpj, string Cep);

@@ -8,8 +8,8 @@ namespace TL.Shipay.Project.Api.Examples
     public sealed class ClienteRequestExample : IExamplesProvider<ClienteRequest>
     {
         public ClienteRequest GetExamples() => new (
-            Cnpj: "12.345.678/0001-90",
-            Cep: "12345-678"
+            Cnpj: "12345678000190",
+            Cep: "12345678"
         );
     }
 }
