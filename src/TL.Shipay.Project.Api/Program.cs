@@ -3,6 +3,7 @@ using Asp.Versioning.ApiExplorer;
 using FluentValidation;
 using Swashbuckle.AspNetCore.Filters;
 using TL.Shipay.Project.Api.Extensions;
+using TL.Shipay.Project.Application.Filters;
 using TL.Shipay.Project.Application.Validators;
 using TL.Shipay.Project.Infrastructure;
 
@@ -16,11 +17,16 @@ builder.Services.AddServices();
 builder.Services.AddMapperProfiles();
 builder.Services.AddHttpClientFactory(builder.Configuration);
 builder.Services.AddExternalServices();
-builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ClienteValidator>();
 
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<FluentValidationFilter>();
+});
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";

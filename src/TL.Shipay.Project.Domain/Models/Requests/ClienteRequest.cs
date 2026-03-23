@@ -6,6 +6,10 @@ public class ClienteRequest
         this.Cnpj = Cnpj;
         this.Cep = Cep;
     }
+    public ClienteRequest()
+    {
+            
+    }
 
     public string Cnpj { get; set; }
     public string Cep { get; set; }

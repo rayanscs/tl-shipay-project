@@ -21,7 +21,8 @@ namespace TL.Shipay.Project.Application.Validators
                     return agora >= limite;
                 })
                 .WithMessage("Cnpj alfanumérico só pode ser utilizado a partir de jul-2026. Favor utilizar o padrão somente números.")
-                .MaximumLength(14).WithMessage("O CNPJ deve ter no máximo 14 caracteres.")
+                .Length(14).WithMessage("O CNPJ deve ter 14 caracteres.")
+                .Matches(@"^\d{14}$")
                 .Must(ValidarCnpj).WithMessage("O CNPJ informado é inválido.");
 
             RuleFor(x => x.Cep)

@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using TL.Shipay.Project.Api.AppService.v1.Interfaces;
@@ -12,8 +13,9 @@ namespace TL.Shipay.Project.Api.Controllers.v1
     [ApiVersion("1")]
     [Route("api/v{version:apiVersion}/clientes")]
     [Produces("application/json")]
-    public class ClientesController(ILogger<ClientesController> _logger, IClienteAppService _clienteAppService) : ControllerBase
+    public class ClientesController(ILogger<ClientesController> _logger, IClienteAppService _clienteAppService, IValidator<ClienteRequest> _validator) : ControllerBase
     {
+
         /// <summary>
         /// Efetua a verificação dos dados do cliente.
         /// </summary>
@@ -28,10 +30,7 @@ namespace TL.Shipay.Project.Api.Controllers.v1
         public async Task<ActionResult<Response>> PostAsync([FromBody] ClienteRequest request, CancellationToken cancellationToken)
         {
             var result = await _clienteAppService.ProcessaValidacaoDadosEmpresaAsync(request.Cnpj, request.Cep, cancellationToken);
-            if (!result.Sucesso)
-                return NotFound(result);
-            else
-                return Ok(result);
+            return !result.Sucesso ? NotFound(result) : Ok(result);
         }
     }
 }

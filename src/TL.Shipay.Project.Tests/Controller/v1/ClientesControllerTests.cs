@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -17,12 +18,14 @@ namespace TL.Shipay.Project.Tests.Controller.v1
 
         private readonly Mock<IClienteAppService> _clienteAppServiceMock = new();
         private readonly Mock<ILogger<ClientesController>> _loggerMock = new();
+        private readonly Mock<IValidator<ClienteRequest>> _validatorMock = new();
 
         public ClientesControllerTests()
         {
-            _controller = new(
+            _controller = new (
                 _loggerMock.Object,
-                _clienteAppServiceMock.Object
+                _clienteAppServiceMock.Object,
+                _validatorMock.Object
                 );
         }
 
