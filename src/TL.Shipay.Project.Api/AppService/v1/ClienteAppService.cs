@@ -6,9 +6,9 @@ namespace TL.Shipay.Project.Api.AppService.v1
 {
     public sealed class ClienteAppService(IEmpresaProviderService _provider) : IClienteAppService
     {
-        public async Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken)
+        public async Task<Response> ProcessaValidacaoDadosEmpresaAsync(string cnpj, string cep, CancellationToken cancellationToken)
         {
-            return await _provider.ProcessaValidacaoDadosEmpresa(cnpj, cep, cancellationToken);
+            return await _provider.ProcessaValidacaoDadosEmpresaAsync(cnpj, cep, cancellationToken);
         }
     }
 }

@@ -98,14 +98,14 @@ namespace TL.Shipay.Project.Application.Services
             return await execute();
         }
 
-        private async Task<bool> ValidaMatchEnderecos(DadosEmpresa empresa, Endereco endereco)
+        private async Task<bool> ValidaMatchEnderecosAsync(DadosEmpresa empresa, Endereco endereco)
         {
             var municipioMatch = string.Equals(StringExtensions.NormalizaString(empresa.Municipio), StringExtensions.NormalizaString(endereco.Cidade), StringComparison.Ordinal);
             var logradouroMatch = string.Equals(StringExtensions.NormalizaString(empresa.Logradouro), StringExtensions.NormalizaString(endereco.Logradouro), StringComparison.Ordinal);
             return await Task.FromResult(municipioMatch && logradouroMatch);
         }
 
-        public async Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken)
+        public async Task<Response> ProcessaValidacaoDadosEmpresaAsync(string cnpj, string cep, CancellationToken cancellationToken)
         {
             var dadosEmpresaResponse = await ObterDadosEmpresaBrasilApiAsync(cnpj, cancellationToken);
             if (!dadosEmpresaResponse.Sucesso)
@@ -138,7 +138,7 @@ namespace TL.Shipay.Project.Application.Services
 
             var response = new Response();
 
-            if (await ValidaMatchEnderecos(dadosEmpresa, endereco))
+            if (await ValidaMatchEnderecosAsync(dadosEmpresa, endereco))
             {
                 _logger.LogInformation($"{ETitleLog.ValidacaoDadosSucesso.Texto()}");
                 response.MensagemPrincipal = $"{LogMessagesExtensions.InformacoesCoincidem()}";

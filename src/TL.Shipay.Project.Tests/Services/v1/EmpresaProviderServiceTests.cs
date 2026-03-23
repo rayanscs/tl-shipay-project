@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using AutoMapper;
+using Bogus;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -7,7 +8,9 @@ using TL.Shipay.Project.Application.Services;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
 using TL.Shipay.Project.Domain.Models;
 using TL.Shipay.Project.Domain.Models.Http;
+using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj;
 using TL.Shipay.Project.Infrastructure;
+using TL.Shipay.Project.Tests.Utils;
 using Xunit;
 
 namespace TL.Shipay.Project.Tests.Services.v1
@@ -19,19 +22,27 @@ namespace TL.Shipay.Project.Tests.Services.v1
 
         private readonly Mock<IBrasilApiManager> _brasilApiManagerMock = new();
         private readonly Mock<IViaCepManager> _viaCepApiManagerMock = new();
-        private readonly Mock<IOptions<ResilienciaConfig>> _resConfigMock = new();
+        private readonly Mock<IOptions<InfrastructureOptions>> _resConfigMock = new();
         private readonly Mock<ILogger<EmpresaProviderService>> _loggerMock = new();
         private readonly Mock<IMapper> _mapperMock = new();
 
         public EmpresaProviderServiceTests()
         {
             _resConfigMock.Setup(x => x.Value)
-                .Returns(new ResilienciaConfig
-                {
-                    Services = new()
+                .Returns(new InfrastructureOptions
+                {   ResilienciaConfig = new ()
                     {
-                        ServicePrincipal = "BrasilApi"
+                        RetryCount = 3,
+                        CircuitBreakerFailureRatio = 0.5,
+                        CircuitBreakerMinimumThroughput = 10,
+                        CircuitBreakerSamplingDuration = 60,
+                        CircuitBreakerBreakDuration = 30,
+                        Services = new()
+                        {
+                            ServicePrincipal = "BrasilApi"
+                        }
                     }
+                   
                 });
 
             _empresaProviderService = new(
@@ -46,23 +57,29 @@ namespace TL.Shipay.Project.Tests.Services.v1
         [Fact]
         public async Task ProcessarValidacao_DeveRetornarSucesso_QuandoEnderecosCoincidem()
         {
-            var cnpj = "123";
-            var cep = "123";
+            var cnpj = TestsExtensions.GerarCnpj();
+            var cep = TestsExtensions.GerarCepSimples();
 
             var empresaResponse = new Response();
             var enderecoResponse = new Response();
 
-            var empresa = new DadosEmpresa
-            {
-                Municipio = "Curitiba",
-                Logradouro = "Rua A"
-            };
+            var empresa = new Faker<DadosEmpresa>("pt_BR")
+                 .RuleFor(e => e.Municipio, f => f.Address.City())
+                 .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+                 .Generate();
 
-            var endereco = new Endereco
+            var dadosCnpjObj = new DadosCnpjBrasilApiResponse
             {
-                Cidade = "Curitiba",
-                Logradouro = "Rua A"
+                Municipio = empresa.Municipio,
+                Logradouro = empresa.Logradouro
             };
+            empresaResponse.SetData(dadosCnpjObj);
+
+            var endereco = new Faker<Endereco>("pt_BR")
+                .RuleFor(e => e.Cep, _ => cep)
+                .RuleFor(e => e.Cidade, _ => empresa.Municipio)
+                .RuleFor(e => e.Logradouro, _ => empresa.Logradouro)
+                .Generate();
 
             _brasilApiManagerMock
                 .Setup(x => x.ObterDadosEmpresaBrasilApiAsync(cnpj, It.IsAny<CancellationToken>()))
@@ -73,16 +90,16 @@ namespace TL.Shipay.Project.Tests.Services.v1
                 .ReturnsAsync(enderecoResponse);
 
             _mapperMock
-                .Setup(x => x.Map<DadosEmpresa>(empresaResponse))
+                .Setup(x => x.Map<DadosEmpresa>(It.IsAny<DadosCnpjBrasilApiResponse>()))
                 .Returns(empresa);
 
             _mapperMock
                 .Setup(x => x.Map<Endereco>(It.IsAny<object>()))
                 .Returns(endereco);
 
-            enderecoResponse.SetData(new { street = "Rua A", cidade = "Curitiba" });
+            enderecoResponse.SetData(new { street = empresa.Logradouro, cidade = empresa.Municipio });
 
-            var result = await _empresaProviderService.ProcessarValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
+            var result = await _empresaProviderService.ProcessaValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
 
             Assert.True(result.Notifications.Count == 0);
             Assert.Contains("coincidem", result.MensagemPrincipal, StringComparison.OrdinalIgnoreCase);
@@ -91,23 +108,30 @@ namespace TL.Shipay.Project.Tests.Services.v1
         [Fact]
         public async Task ProcessarValidacao_DeveRetornarFalha_QuandoEnderecosNaoCoincidem()
         {
-            var cnpj = "123";
-            var cep = "123";
+            var cnpj = TestsExtensions.GerarCnpj();
+            var cep = TestsExtensions.GerarCepSimples();
 
             var empresaResponse = new Response();
             var enderecoResponse = new Response();
 
-            var empresa = new DadosEmpresa
+            var empresa = new Faker<DadosEmpresa>("pt_BR")
+             .RuleFor(e => e.Municipio, f => f.Address.City())
+             .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+             .Generate();
+
+            var dadosCnpjObj = new DadosCnpjBrasilApiResponse
             {
-                Municipio = "Curitiba",
-                Logradouro = "Rua A"
+                Municipio = empresa.Municipio,
+                Logradouro = empresa.Logradouro
             };
 
-            var endereco = new Endereco
-            {
-                Cidade = "São Paulo",
-                Logradouro = "Rua B"
-            };
+            empresaResponse.SetData(dadosCnpjObj);
+
+            var endereco = new Faker<Endereco>("pt_BR")
+             .RuleFor(e => e.Cidade, f => f.Address.City())
+             .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+             .RuleFor(e => e.Cep, f => f.Address.ZipCode("########"))
+             .Generate();
 
             _brasilApiManagerMock
                 .Setup(x => x.ObterDadosEmpresaBrasilApiAsync(cnpj, It.IsAny<CancellationToken>()))
@@ -118,7 +142,7 @@ namespace TL.Shipay.Project.Tests.Services.v1
                 .ReturnsAsync(enderecoResponse);
 
             _mapperMock
-                .Setup(x => x.Map<DadosEmpresa>(empresaResponse))
+                .Setup(x => x.Map<DadosEmpresa>(It.IsAny<DadosCnpjBrasilApiResponse>()))
                 .Returns(empresa);
 
             _mapperMock
@@ -127,7 +151,7 @@ namespace TL.Shipay.Project.Tests.Services.v1
 
             enderecoResponse.SetData(new { street = "Rua B", cidade = "São Paulo" });
 
-            var result = await _empresaProviderService.ProcessarValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
+            var result = await _empresaProviderService.ProcessaValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
 
             Assert.NotEmpty(result.Notifications);
         }
@@ -135,8 +159,19 @@ namespace TL.Shipay.Project.Tests.Services.v1
         [Fact]
         public async Task ProcessarValidacao_DeveRetornarErro_QuandoEmpresaFalhar()
         {
-            var cnpj = "123";
-            var cep = "123";
+            var cnpj = TestsExtensions.GerarCnpj();
+            var cep = TestsExtensions.GerarCepSimples();
+
+            var empresa = new Faker<DadosEmpresa>("pt_BR")
+             .RuleFor(e => e.Municipio, f => f.Address.City())
+             .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+             .Generate();
+
+            var endereco = new Faker<Endereco>("pt_BR")
+             .RuleFor(e => e.Cidade, f => f.Address.City())
+             .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+             .RuleFor(e => e.Cep, f => f.Address.ZipCode("########"))
+             .Generate();
 
             var empresaResponse = new Response();
             empresaResponse.AddNotification("erro");
@@ -145,7 +180,7 @@ namespace TL.Shipay.Project.Tests.Services.v1
                 .Setup(x => x.ObterDadosEmpresaBrasilApiAsync(cnpj, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(empresaResponse);
 
-            var result = await _empresaProviderService.ProcessarValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
+            var result = await _empresaProviderService.ProcessaValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
 
             Assert.False(result.Sucesso);
         }
@@ -153,25 +188,31 @@ namespace TL.Shipay.Project.Tests.Services.v1
         [Fact]
         public async Task ProcessarValidacao_DeveUsarFallback_QuandoBrasilApiFalhar()
         {
-            var cnpj = "123";
-            var cep = "123";
+            var cnpj = TestsExtensions.GerarCnpj();
+            var cep = TestsExtensions.GerarCepSimples();
 
             var empresaResponse = new Response();
             var falhaCep = new Response();
             falhaCep.AddNotification("erro");
             var sucessoViaCep = new Response();
 
-            var empresa = new DadosEmpresa
-            {
-                Municipio = "Curitiba",
-                Logradouro = "Rua A"
-            };
+            var empresa = new Faker<DadosEmpresa>("pt_BR")
+                 .RuleFor(e => e.Municipio, f => f.Address.City())
+                 .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+                 .Generate();
 
-            var endereco = new Endereco
+            var dadosCnpjObj = new DadosCnpjBrasilApiResponse
             {
-                Cidade = "Curitiba",
-                Logradouro = "Rua A"
+                Municipio = empresa.Municipio,
+                Logradouro = empresa.Logradouro
             };
+            empresaResponse.SetData(dadosCnpjObj);
+
+            var endereco = new Faker<Endereco>("pt_BR")
+                .RuleFor(e => e.Cep, _ => cep)
+                .RuleFor(e => e.Cidade, _ => empresa.Municipio)
+                .RuleFor(e => e.Logradouro, _ => empresa.Logradouro)
+                .Generate();
 
             _brasilApiManagerMock
                 .Setup(x => x.ObterDadosEmpresaBrasilApiAsync(cnpj, It.IsAny<CancellationToken>()))
@@ -186,16 +227,16 @@ namespace TL.Shipay.Project.Tests.Services.v1
                 .ReturnsAsync(sucessoViaCep);
 
             _mapperMock
-                .Setup(x => x.Map<DadosEmpresa>(empresaResponse))
+                .Setup(x => x.Map<DadosEmpresa>(It.IsAny<DadosCnpjBrasilApiResponse>()))
                 .Returns(empresa);
 
             _mapperMock
                 .Setup(x => x.Map<Endereco>(It.IsAny<object>()))
                 .Returns(endereco);
 
-            sucessoViaCep.SetData(new { logradouro = "Rua A", localidade = "Curitiba" });
+            sucessoViaCep.SetData(new { logradouro = empresa.Logradouro, localidade = empresa.Municipio });
 
-            var result = await _empresaProviderService.ProcessarValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
+            var result = await _empresaProviderService.ProcessaValidacaoDadosEmpresaAsync(cnpj, cep, CancellationToken.None);
 
             Assert.Empty(result.Notifications);
 

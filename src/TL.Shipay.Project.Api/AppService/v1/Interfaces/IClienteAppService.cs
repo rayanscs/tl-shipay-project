@@ -4,6 +4,6 @@ namespace TL.Shipay.Project.Api.AppService.v1.Interfaces
 {
     public interface IClienteAppService
     {
-        Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken);
+        Task<Response> ProcessaValidacaoDadosEmpresaAsync(string cnpj, string cep, CancellationToken cancellationToken);
     }
 }

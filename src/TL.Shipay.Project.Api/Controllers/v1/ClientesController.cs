@@ -18,13 +18,13 @@ namespace TL.Shipay.Project.Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Post([FromBody] ClienteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> PostAsync([FromBody] ClienteRequest request, CancellationToken cancellationToken)
         {
-            var result = await _clienteAppService.ProcessaValidacaoDadosEmpresa(request.Cnpj, request.Cep, cancellationToken);
+            var result = await _clienteAppService.ProcessaValidacaoDadosEmpresaAsync(request.Cnpj, request.Cep, cancellationToken);
             if (!result.Sucesso)
                 return NotFound(result);
             else
-                return Ok();
+                return Ok(result);
         }
     }
 }

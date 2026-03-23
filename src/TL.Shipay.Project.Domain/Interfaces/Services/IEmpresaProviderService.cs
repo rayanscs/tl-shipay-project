@@ -4,6 +4,6 @@ namespace TL.Shipay.Project.Domain.Interfaces.Services
 {
     public interface IEmpresaProviderService
     {
-        Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken);
+        Task<Response> ProcessaValidacaoDadosEmpresaAsync(string cnpj, string cep, CancellationToken cancellationToken);
     }
 }

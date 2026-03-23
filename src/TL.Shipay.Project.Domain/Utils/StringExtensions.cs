@@ -35,7 +35,24 @@ namespace TL.Shipay.Project.Domain.Utils
                 if (uc != UnicodeCategory.NonSpacingMark) sb.Append(ch);
             }
 
-            return sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant();
+            var normalized = sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant();
+            normalized = RemoverPalavrasReservadasEndereco(normalized);
+
+            return normalized.Trim();
+        }
+
+        private static string RemoverPalavrasReservadasEndereco(string s)
+        {
+            // Lista de palavras-chave a remover (com vírgulas opcionais)
+            var keywords = new[] { "RUA", "R.", "AVENIDA", "AV." };
+
+            foreach (var keyword in keywords)
+            {
+                // Remove a palavra-chave seguida por vírgula e espaços
+                s = Regex.Replace(s, @$"\b{Regex.Escape(keyword)}\s*,?\s*", string.Empty, RegexOptions.IgnoreCase);
+            }
+
+            return s.Trim();
         }
     }
 }
