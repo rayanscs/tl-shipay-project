@@ -72,7 +72,7 @@ namespace TL.Shipay.Project.Application.Services
                 {
                     var resp = await ObterEnderecoViaCepAsync(cep, cancellationToken);
 
-                    if ((resp.MensagemPrincipal.Contains("NotFound") || resp.MensagemPrincipal.Contains("404")))
+                    if (!string.IsNullOrWhiteSpace(resp.MensagemPrincipal) && (resp.MensagemPrincipal.Contains("NotFound") || resp.MensagemPrincipal.Contains("404")))
                         return resp;
                     
                     if (!resp.Sucesso)
