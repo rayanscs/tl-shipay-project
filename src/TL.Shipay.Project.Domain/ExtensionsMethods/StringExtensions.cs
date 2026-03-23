@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using TL.Shipay.Project.Domain.Models;
 
 namespace TL.Shipay.Project.Domain.ExtensionsMelthods
 {
@@ -11,12 +10,12 @@ namespace TL.Shipay.Project.Domain.ExtensionsMelthods
 
         public static string FormataCep(string cep)
         {
-            if (string.IsNullOrWhiteSpace(cep)) 
+            if (string.IsNullOrWhiteSpace(cep))
                 return string.Empty;
 
             var digitos = Regex.Replace(cep, @"\D", "");
-          
-            if (digitos.Length > 8) 
+
+            if (digitos.Length > 8)
                 return string.Empty;
 
             return digitos.Substring(0, 5) + "-" + digitos.Substring(5, 3);

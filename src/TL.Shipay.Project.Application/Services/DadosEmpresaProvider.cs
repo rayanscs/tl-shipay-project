@@ -16,10 +16,10 @@ using TL.Shipay.Project.Infrastructure.Utils;
 
 namespace TL.Shipay.Project.Application.Services
 {
-    public class DadosEmpresaProvider(IBrasilApiManager _brasilApiManager, 
-                                      IViaCepManager _viaCepManager, 
-                                      IOptions<ResilienciaConfig> _resConfig, 
-                                      ILogger<DadosEmpresaProvider> _logger, 
+    public class DadosEmpresaProvider(IBrasilApiManager _brasilApiManager,
+                                      IViaCepManager _viaCepManager,
+                                      IOptions<InfrasctructureOptions> _resConfig,
+                                      ILogger<DadosEmpresaProvider> _logger,
                                       IMapper _mapper) : IDadosEmpresaProvider
     {
         private async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
@@ -87,20 +87,20 @@ namespace TL.Shipay.Project.Application.Services
         {
             var municipioMatch = string.Equals(StringExtensions.NormalizaString(empresa.Municipio), StringExtensions.NormalizaString(endereco.Cidade), StringComparison.Ordinal);
             var logradouroMatch = string.Equals(StringExtensions.NormalizaString(empresa.Logradouro), StringExtensions.NormalizaString(endereco.Logradouro), StringComparison.Ordinal);
-            return municipioMatch && logradouroMatch;    
+            return municipioMatch && logradouroMatch;
         }
 
         public async Task<Response> ProcessaValidacaoDadosEmpresa(string cnpj, string cep, CancellationToken cancellationToken)
         {
             var dadosEmpresaResponse = await ObterDadosEmpresaBrasilApiAsync(cnpj, cancellationToken);
             if (!dadosEmpresaResponse.Sucesso)
-                 return dadosEmpresaResponse;
+                return dadosEmpresaResponse;
 
             DadosEmpresa dadosEmpresa = _mapper.Map<DadosEmpresa>(dadosEmpresaResponse);
 
             var resPrincipal = InfrastructureExtensions.ObterServicoPrincipal(_resConfig);
             var enderecoResponse = await ObterEnderecoPorCepAsync(cep, resPrincipal, cancellationToken);
-            if (!enderecoResponse.Sucesso) 
+            if (!enderecoResponse.Sucesso)
                 return enderecoResponse;
 
             var objeto = enderecoResponse.GetData<object>();

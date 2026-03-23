@@ -17,7 +17,7 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             {
                 var attr = p.GetCustomAttribute<JsonPropertyNameAttribute>();
                 var jsonName = attr?.Name ?? p.Name;
-                
+
                 if (string.Equals(jsonName, campo, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
@@ -37,7 +37,7 @@ namespace TL.Shipay.Project.Domain.ExtensionsMethods
             {
                 (true, false) => EResilienciaServico.BrasilApi,
                 (false, true) => EResilienciaServico.ViaCep,
-                (true, true) =>  throw new InvalidOperationException("Falha ao desserializar para TA ou TB."),
+                (true, true) => throw new InvalidOperationException("Falha ao desserializar para TA ou TB."),
                 _ => throw new ArgumentException("O objeto não pode ser convertido.")
             };
         }

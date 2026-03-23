@@ -7,8 +7,8 @@ using TL.Shipay.Project.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("ApiManagerUrl"));
-builder.Services.Configure<ResilienciaConfig>(builder.Configuration.GetSection("ResilienciaConfig"));
+builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("RouteOptions"));
+builder.Services.Configure<InfrasctructureOptions>(builder.Configuration.GetSection("ResilienciaConfig"));
 
 var configuration = builder.Configuration;
 

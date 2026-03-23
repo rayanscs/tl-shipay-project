@@ -27,7 +27,7 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
             _baseUrl = $"{_options.ApiManagerUrl.BrasilApi.BaseUrl}";
             _dadosCnpjUrl = $"{_options.ApiManagerUrl.BrasilApi.DadosCnpj}";
             _dadosCepUrl = $"{_options.ApiManagerUrl.BrasilApi.DadosCep}";
-        } 
+        }
 
         public async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
         {
@@ -39,8 +39,8 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 if (!httpResponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning($"Consulta BrasilApi Cnpj falhou. Cnpj: {cnpj} StatusCode: {httpResponse.StatusCode}");
-                    response.AddNotification(ECodeTypeLog.BrasilApiCnpjError.Codigo(), 
-                                             ETitleLog.BrasilApiErroConsultaCnpj.Texto(), 
+                    response.AddNotification(ECodeTypeLog.BrasilApiCnpjError.Codigo(),
+                                             ETitleLog.BrasilApiErroConsultaCnpj.Texto(),
                                              $"Não foi possível obter os dados para o Cnpj {cnpj}, {LogMessagesExtensions.TenteNovamenteMaisTarde()}");
 
                     return response;
@@ -50,8 +50,8 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 if (BrasilApiCnpj is null)
                 {
                     _logger.LogWarning($"Consulta BrasilApi: Consulta do Cnpj retornou nula. Cnpj: {cnpj} StatusCode: {StatusCodes.Status404NotFound}");
-                    response.AddNotification(ECodeTypeLog.BrasilApiNotFound.Codigo(), 
-                                             ETitleLog.BrasilApiErroConsultaCnpj.Texto(), 
+                    response.AddNotification(ECodeTypeLog.BrasilApiNotFound.Codigo(),
+                                             ETitleLog.BrasilApiErroConsultaCnpj.Texto(),
                                              $"Não foi encontrado os dados para o Cnpj {cnpj}, a consulta retornou vazia.");
 
                     return response;
@@ -68,7 +68,7 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 var httpError = ex.HttpRequestError;
 
                 _logger.LogError(ex, $"Erro ao consultar BrasilApi Cnpj. Status: {status} Mensagem: Erro ao consultar o Cnpj {cnpj}. {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)}");
-                response.AddNotification(ECodeTypeLog.BrasilApiExceptionError.Codigo(), 
+                response.AddNotification(ECodeTypeLog.BrasilApiExceptionError.Codigo(),
                                          ETitleLog.BrasilApiErroConsultaCnpj.Texto(),
                                          $"Erro ao consultar o Cnpj {cnpj}, {LogMessagesExtensions.TenteNovamenteMaisTardeComSuporte()}");
 
@@ -90,7 +90,7 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                     response.AddNotification(ECodeTypeLog.BrasilApiCepError.Codigo(),
                                              ETitleLog.BrasilApiErroConsultaCep.Texto(),
                                              $"Não foi possível obter os dados para o Cep {cep}. StatusCode: {httpResponse.StatusCode}");
-                    
+
                     return response;
                 }
 
@@ -98,10 +98,10 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 if (BrasilApiCnpj is null)
                 {
                     _logger.LogWarning($"Consulta BrasilApi: Consulta do Cep retornou nula. Cep: {cep} StatusCode: {StatusCodes.Status404NotFound}");
-                    response.AddNotification(ECodeTypeLog.BrasilApiNotFound.Codigo(), 
-                                             ETitleLog.BrasilApiErroConsultaCep.Texto(), 
+                    response.AddNotification(ECodeTypeLog.BrasilApiNotFound.Codigo(),
+                                             ETitleLog.BrasilApiErroConsultaCep.Texto(),
                                              $"Não foi encontrado os dados para o Cep {cep}, consulta retornou vazia. StatusCode: {StatusCodes.Status404NotFound}");
-                    
+
                     return response;
                 }
 
@@ -117,9 +117,9 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
 
                 _logger.LogError(ex, $"Erro ao consultar BrasilApi. Status: {status} {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)}");
                 response.AddNotification(ECodeTypeLog.BrasilApiExceptionError.Codigo(),
-                                        ETitleLog.BrasilApiErroConsultaCep.Texto(), 
+                                        ETitleLog.BrasilApiErroConsultaCep.Texto(),
                                         $"Erro ao consultar o Cep {cep}. Mensagem: {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)})");
-                
+
                 return response;
             }
         }

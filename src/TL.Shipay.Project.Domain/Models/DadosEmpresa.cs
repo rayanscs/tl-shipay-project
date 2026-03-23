@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj;
-
-namespace TL.Shipay.Project.Domain.Models
+﻿namespace TL.Shipay.Project.Domain.Models
 {
     public class DadosEmpresa
     {

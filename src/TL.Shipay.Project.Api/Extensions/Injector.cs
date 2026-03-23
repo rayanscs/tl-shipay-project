@@ -1,6 +1,4 @@
-﻿using System.Net;
-using TL.Shipay.Project.Application.Interfaces;
-using TL.Shipay.Project.Application.Services;
+﻿using TL.Shipay.Project.Application.Services;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
 using TL.Shipay.Project.Domain.Interfaces.Services;
 using TL.Shipay.Project.Infrastructure.ExternalServices;
@@ -11,7 +9,7 @@ namespace TL.Shipay.Project.Api.Extensions
     {
         public static IServiceCollection AddExternalServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddScoped<IBrasilApiManager,BrasilApiManager>();
+            services.AddScoped<IBrasilApiManager, BrasilApiManager>();
             services.AddScoped<IViaCepManager, ViaCepManager>();
 
             return services;

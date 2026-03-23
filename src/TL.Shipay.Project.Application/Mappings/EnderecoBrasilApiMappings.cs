@@ -11,6 +11,6 @@ namespace TL.Shipay.Project.Application.Mappings
                     .ForMember(dest => dest.Cep, opt => opt.MapFrom(src => src.Cep))
                     .ForMember(dest => dest.Logradouro, opt => opt.MapFrom(src => src.Street))
                     .ForMember(dest => dest.Cidade, opt => opt.MapFrom(src => src.City))
-                    .ReverseMap();        
+                    .ReverseMap();
     }
 }

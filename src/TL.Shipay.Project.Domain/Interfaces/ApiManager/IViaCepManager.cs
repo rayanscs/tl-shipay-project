@@ -4,6 +4,6 @@ namespace TL.Shipay.Project.Domain.Interfaces.ApiManager
 {
     public interface IViaCepManager
     {
-        Task<Response> ObterEnderecoViaCepAsync(string cep, CancellationToken cancellationToken); 
+        Task<Response> ObterEnderecoViaCepAsync(string cep, CancellationToken cancellationToken);
     }
 }

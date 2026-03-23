@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using System.Diagnostics.CodeAnalysis;
 using TL.Shipay.Project.Domain.Models;
-using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCep;
 using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj;
-using TL.Shipay.Project.Domain.Models.Responses.ViaCep;
 
 namespace TL.Shipay.Project.Application.Mappings
 {

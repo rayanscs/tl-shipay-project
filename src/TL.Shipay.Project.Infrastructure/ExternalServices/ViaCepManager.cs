@@ -38,22 +38,22 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 if (!httpResponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning($"Consulta ViaCep falhou. Cep: {cepLimpo} StatusCode: {httpResponse.StatusCode}");
-                    response.AddNotification(ECodeTypeLog.ViaCepError.Codigo(), 
-                                             ETitleLog.ViaCepErroConsulta.Texto(), 
+                    response.AddNotification(ECodeTypeLog.ViaCepError.Codigo(),
+                                             ETitleLog.ViaCepErroConsulta.Texto(),
                                              $"Não foi possível obter o endereço para o CEP {cep}, {LogMessagesExtensions.TenteNovamenteMaisTarde()}");
-                    
-                    return response; 
+
+                    return response;
                 }
 
                 var viaCep = await httpResponse.Content.ReadFromJsonAsync<ViaCepResponse>(cancellationToken: cancellationToken);
                 if (viaCep is null)
                 {
                     _logger.LogWarning($"Consulta ViaCep: Consulta do Cep retornou nula. Cep: {cepLimpo} StatusCode: {StatusCodes.Status404NotFound}");
-                    response.AddNotification(ECodeTypeLog.ViaCepNotFound.Codigo(), 
-                                             ETitleLog.ViaCepErroConsulta.Texto(), 
+                    response.AddNotification(ECodeTypeLog.ViaCepNotFound.Codigo(),
+                                             ETitleLog.ViaCepErroConsulta.Texto(),
                                              $"Não foram encontrados os dados de endereço para o Cep {cep}, a consulta retornou vazia.");
-                    
-                    return response;   
+
+                    return response;
                 }
 
                 response.SetData(viaCep);
@@ -67,10 +67,10 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
                 var httpError = ex.HttpRequestError;
 
                 _logger.LogError(ex, $"Erro ao consultar ViaCep. Status: {status} Mensagem: Erro ao consultar o Cep {cepLimpo}. {LogMessagesExtensions.ComDetalheOpcional(mensagem, detalheInterno)}");
-                response.AddNotification(ECodeTypeLog.ViaCepExceptionError.Codigo(), 
-                                         ETitleLog.ViaCepErroConsulta.Texto(), 
+                response.AddNotification(ECodeTypeLog.ViaCepExceptionError.Codigo(),
+                                         ETitleLog.ViaCepErroConsulta.Texto(),
                                          $"Erro ao consultar o Cep {cep}, {LogMessagesExtensions.TenteNovamenteMaisTardeComSuporte()}");
-                
+
                 return response;
             }
         }
