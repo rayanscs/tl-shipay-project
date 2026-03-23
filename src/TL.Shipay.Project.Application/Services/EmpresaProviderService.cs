@@ -8,6 +8,7 @@ using TL.Shipay.Project.Domain.Interfaces.Services;
 using TL.Shipay.Project.Domain.Models;
 using TL.Shipay.Project.Domain.Models.Http;
 using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCep;
+using TL.Shipay.Project.Domain.Models.Responses.BrasilApi.DadosCnpj;
 using TL.Shipay.Project.Domain.Models.Responses.ViaCep;
 using TL.Shipay.Project.Domain.Utils;
 using TL.Shipay.Project.Infrastructure;
@@ -15,12 +16,27 @@ using TL.Shipay.Project.Infrastructure.Utils;
 
 namespace TL.Shipay.Project.Application.Services
 {
-    public class EmpresaProviderService(IBrasilApiManager _brasilApiManager,
-                                      IViaCepManager _viaCepManager,
-                                      IOptions<InfrastructureOptions> _resConfig,
-                                      ILogger<EmpresaProviderService> _logger,
-                                      IMapper _mapper) : IEmpresaProviderService
+    public class EmpresaProviderService : IEmpresaProviderService
     {
+        private readonly IBrasilApiManager _brasilApiManager;
+        private readonly IViaCepManager _viaCepManager;
+        private readonly IOptions<InfrastructureOptions> _resConfig;
+        private readonly ILogger<EmpresaProviderService> _logger;
+        private readonly IMapper _mapper;
+
+        public EmpresaProviderService(IBrasilApiManager brasilApiManager,
+                                      IViaCepManager viaCepManager,
+                                      IOptions<InfrastructureOptions> resConfig,
+                                      ILogger<EmpresaProviderService> logger,
+                                      IMapper mapper)
+        {
+            _brasilApiManager = brasilApiManager ?? throw new ArgumentNullException(nameof(brasilApiManager));
+            _viaCepManager = viaCepManager ?? throw new ArgumentNullException(nameof(viaCepManager));
+            _resConfig = resConfig ?? throw new ArgumentNullException(nameof(resConfig));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
         private async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
             => await _brasilApiManager.ObterDadosEmpresaBrasilApiAsync(cnpj, cancellationToken);
 
@@ -95,16 +111,16 @@ namespace TL.Shipay.Project.Application.Services
             if (!dadosEmpresaResponse.Sucesso)
                 return dadosEmpresaResponse;
 
-            DadosEmpresa dadosEmpresa = _mapper.Map<DadosEmpresa>(dadosEmpresaResponse);
+            var dadosEmpresaObj = dadosEmpresaResponse.GetData<DadosCnpjBrasilApiResponse>();
+            DadosEmpresa dadosEmpresa = _mapper.Map<DadosEmpresa>(dadosEmpresaObj);
 
-            var resPrincipal = InfrastructureUtils.ObterServicoPrincipal(_resConfig);
+            var resPrincipal = InfrastructureUtils.ObterServicoPrincipal(_resConfig.Value);
             var enderecoResponse = await ObterEnderecoPorCepAsync(cep, resPrincipal, cancellationToken);
             if (!enderecoResponse.Sucesso)
                 return enderecoResponse;
 
-            var objeto = enderecoResponse.GetData<object>();
-            var servicoUtilizando = objeto.IdentificarTypeofEndereco("street", "logradouro");
-            var json = JsonConvert.SerializeObject(objeto);
+            var servicoUtilizando = enderecoResponse.Data.IdentificarTypeofEndereco("street", "logradouro");
+            var json = JsonConvert.SerializeObject(enderecoResponse.Data);
 
             var endereco = new Endereco();
 

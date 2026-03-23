@@ -2,11 +2,6 @@
 {
     public class ApiManagerUrlOptions
     {
-        public ApiManagerUrl ApiManagerUrl { get; set; }
-    }
-
-    public class ApiManagerUrl
-    {
         public BrasilApi BrasilApi { get; set; }
         public ViaCep ViaCep { get; set; }
     }

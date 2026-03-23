@@ -1,4 +1,5 @@
-﻿using TL.Shipay.Project.Infrastructure;
+﻿using TL.Shipay.Project.Domain.Interfaces.ApiManager;
+using TL.Shipay.Project.Infrastructure;
 using TL.Shipay.Project.Infrastructure.ExternalServices;
 
 namespace TL.Shipay.Project.Api.Extensions
@@ -10,7 +11,7 @@ namespace TL.Shipay.Project.Api.Extensions
             var infrastructureOptions = configuration.GetSection("InfrasctructureOptions").Get<InfrastructureOptions>()
                 ?? throw new InvalidOperationException("A sessão InfrasctructureOptions não possui valores.");
 
-            services.AddHttpClient<BrasilApiManager>(client =>
+            services.AddHttpClient<IBrasilApiManager, BrasilApiManager>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddStandardResilienceHandler(options =>
@@ -22,7 +23,7 @@ namespace TL.Shipay.Project.Api.Extensions
                 options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(infrastructureOptions.ResilienciaConfig.CircuitBreakerBreakDuration);    // fica aberto 60s
             });
 
-            services.AddHttpClient<ViaCepManager>(client =>
+            services.AddHttpClient<IViaCepManager, ViaCepManager>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddStandardResilienceHandler(options =>

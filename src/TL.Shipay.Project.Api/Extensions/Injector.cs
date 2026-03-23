@@ -11,7 +11,7 @@ namespace TL.Shipay.Project.Api.Extensions
 {
     public static class Injector
     {
-        public static IServiceCollection AddExternalServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
             services.AddScoped<IBrasilApiManager, BrasilApiManager>();
             services.AddScoped<IViaCepManager, ViaCepManager>();

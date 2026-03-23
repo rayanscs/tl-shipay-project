@@ -4,9 +4,8 @@ namespace TL.Shipay.Project.Infrastructure.Utils
 {
     public static class InfrastructureUtils
     {
-        public static string ObterServicoPrincipal(IOptions<InfrastructureOptions> _resConfig)
+        public static string ObterServicoPrincipal(InfrastructureOptions resConfig)
         {
-            var resConfig = _resConfig.Value;
             return resConfig.ResilienciaConfig.Services?.ServicePrincipal ?? "";
         }
     }

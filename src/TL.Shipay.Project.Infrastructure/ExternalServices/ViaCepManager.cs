@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 using TL.Shipay.Project.Domain.Enums;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
@@ -13,18 +14,22 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<ViaCepManager> _logger;
-        private readonly ApiManagerUrlOptions _options;
+        private readonly IOptions<ApiManagerUrlOptions> _options;
         private readonly string _baseUrl;
         private readonly string _cepUrl;
 
-        public ViaCepManager(HttpClient httpClient, ILogger<ViaCepManager> logger, ApiManagerUrlOptions options)
+        public ViaCepManager(HttpClient httpClient, ILogger<ViaCepManager> logger, IOptions<ApiManagerUrlOptions> options)
         {
-            _httpClient = httpClient;
-            _logger = logger;
-            _options = options;
-            _baseUrl = $"{_options.ApiManagerUrl.ViaCep.BaseUrl}";
-            _cepUrl = $"{_options.ApiManagerUrl.ViaCep.DadosCep}";
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _baseUrl = $"{_options.Value.ViaCep.BaseUrl}";
+            _cepUrl = $"{_options.Value.ViaCep.DadosCep}";
         }
+
+        public HttpClient HttpClient { get; }
+        public ILogger<ViaCepManager> Logger { get; }
+        public IOptions<ApiManagerUrlOptions> Options { get; }
 
         public async Task<Response> ObterEnderecoViaCepAsync(string cep, CancellationToken cancellationToken)
         {

@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using FluentValidation;
 using Swashbuckle.AspNetCore.Filters;
 using TL.Shipay.Project.Api.Extensions;
@@ -7,15 +8,14 @@ using TL.Shipay.Project.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<RouteOptions>(builder.Configuration.GetSection("RouteOptions"));
+builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("ApiManagerUrlOptions"));
 builder.Services.Configure<InfrastructureOptions>(builder.Configuration.GetSection("InfrastructureOptions"));
-
-var configuration = builder.Configuration;
 
 builder.Services.AddAppServices();
 builder.Services.AddServices();
 builder.Services.AddMapperProfiles();
-builder.Services.AddHttpClientFactory(configuration);
+builder.Services.AddHttpClientFactory(builder.Configuration);
+builder.Services.AddExternalServices();
 builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ClienteValidator>();
@@ -51,11 +51,19 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shipay TechLeader Test");
-    });
+    app.UseSwaggerUI(options => provider.ApiVersionDescriptions.ToList()
+    .ForEach(
+        description => options.SwaggerEndpoint(
+            url: $"/swagger/{description.GroupName}/swagger.json",
+            name: description.GroupName.ToUpperInvariant()) )
+);
+    //app.UseSwaggerUI(c =>
+    //{
+    //    c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{c.}");
+    //});
 
     app.UseReDoc(options =>
     {

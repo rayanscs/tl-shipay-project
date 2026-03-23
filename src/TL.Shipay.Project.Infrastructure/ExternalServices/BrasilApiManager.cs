@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 using TL.Shipay.Project.Domain.Enums;
 using TL.Shipay.Project.Domain.Interfaces.ApiManager;
@@ -14,19 +15,22 @@ namespace TL.Shipay.Project.Infrastructure.ExternalServices
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<BrasilApiManager> _logger;
-        private readonly ApiManagerUrlOptions _options;
+        private readonly IOptions<ApiManagerUrlOptions> _options;
         private readonly string _baseUrl;
         private readonly string _dadosCnpjUrl;
         private readonly string _dadosCepUrl;
 
-        public BrasilApiManager(HttpClient httpClient, ILogger<BrasilApiManager> logger, ApiManagerUrlOptions options)
+        public BrasilApiManager(HttpClient httpClient, ILogger<BrasilApiManager> logger, IOptions<ApiManagerUrlOptions> options)
         {
-            _httpClient = httpClient;
-            _logger = logger;
-            _options = options;
-            _baseUrl = $"{_options.ApiManagerUrl.BrasilApi.BaseUrl}";
-            _dadosCnpjUrl = $"{_options.ApiManagerUrl.BrasilApi.DadosCnpj}";
-            _dadosCepUrl = $"{_options.ApiManagerUrl.BrasilApi.DadosCep}";
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+
+            var teste = _options.Value;
+
+            _baseUrl = _options.Value.BrasilApi.BaseUrl ?? throw new InvalidOperationException("BrasilApi BaseUrl não configurada.");
+            _dadosCnpjUrl = _options.Value.BrasilApi.DadosCnpj ?? throw new InvalidOperationException("DadosCnpj não configurado.");
+            _dadosCepUrl = _options.Value.BrasilApi.DadosCep ?? throw new InvalidOperationException("DadosCep não configurado.");
         }
 
         public async Task<Response> ObterDadosEmpresaBrasilApiAsync(string cnpj, CancellationToken cancellationToken)
