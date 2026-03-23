@@ -18,6 +18,7 @@ Demonstrar implementação de boas práticas e padrões de desenvolvimento em .N
 - **Http** - Native HttpClient Core
 - **Utils** - Diversas ferramentas desenvolvidas para apoiar no desenvolvimento 
 - **Testes Unitários** - Cobertura com testes unitários para garantir qualidade do código
+- **Normalização de nomes** - Utilização de FormC e FormD
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -32,6 +33,19 @@ Demonstrar implementação de boas práticas e padrões de desenvolvimento em .N
   - Moq
   - AutoFixture
   - Coverlet Collector
+ 
+## Estrutura do Projeto
+```
+tl-shipay-project/
+├── src/
+│   ├── TL.Shipay.Project.API/             # Mostra o sistema para o mundo
+│   ├── TL.Shipay.Project.Application/     # Usa as regras do domínio
+│   ├── TL.Shipay.Project.Domain/          # Núcleo da aplicação
+│   └── TL.Shipay.Project.Infrastructure/  # Conecta o sistema ao mundo real
+├── tests/
+│   └── Shipay.Tests/                      # Testes unitários
+└── README.md
+```
 
 ## 🚀 Como Começar
 
