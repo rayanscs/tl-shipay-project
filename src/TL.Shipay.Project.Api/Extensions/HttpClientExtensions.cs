@@ -1,5 +1,4 @@
 ﻿using TL.Shipay.Project.Domain.Interfaces.ApiManager;
-using TL.Shipay.Project.Domain.Utils;
 using TL.Shipay.Project.Infrastructure;
 using TL.Shipay.Project.Infrastructure.ExternalServices;
 

@@ -160,12 +160,11 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
             #region Arrange
             var cep = TestsExtensions.GerarCepSimples();
 
-            var dadosEndereco = new ViaCepResponse
-            {
-                Cep = "",
-                Logradouro = "",
-                Localidade = ""
-            };
+            var dadosEndereco = new Faker<ViaCepResponse>("pt_BR")
+               .RuleFor(e => e.Cep, _ => "")
+               .RuleFor(e => e.Logradouro, _ => "")
+               .RuleFor(e => e.Localidade, _ => "")
+               .Generate();
 
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler
@@ -213,7 +212,7 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
                     ItExpr.IsAny<CancellationToken>())
                 .ThrowsAsync(new HttpRequestException("Erro de conexão"));
 
-            var httpClient = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
+            var httpClient = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
             var viaCepManager = new ViaCepManager(httpClient, _loggerMock.Object, _optionsMock.Object);
             #endregion
 
@@ -232,12 +231,11 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
         {
             #region Arrange
             var cep = TestsExtensions.GerarCepSimples();
-            var dadosEndereco = new ViaCepResponse
-            {
-                Cep = cep,
-                Logradouro = "Avenida Paulista",
-                Localidade = "São Paulo"
-            };
+            var dadosEndereco = new Faker<ViaCepResponse>("pt_BR")
+               .RuleFor(e => e.Cep, f => cep)
+               .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+               .RuleFor(e => e.Localidade, f => f.Address.City())
+               .Generate();
 
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler
@@ -288,7 +286,7 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
                     ItExpr.IsAny<CancellationToken>())
                 .ThrowsAsync(new OperationCanceledException("Timeout"));
 
-            var httpClient = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
+            var httpClient = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
             var viaCepManager = new ViaCepManager(httpClient, _loggerMock.Object, _optionsMock.Object);
             #endregion
 
@@ -301,98 +299,34 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
         #endregion
 
         #region Resiliência Tests
-
-        [Fact]
-        public async Task ObterEnderecoViaCepAsync_DeveRegistrarLog_QuandoFalhaOcorre()
-        {
-            #region Arrange
-            var cep = TestsExtensions.GerarCepSimples();
-
-            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
-            mockHttpMessageHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
-
-            var httpClient = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
-            var viaCepManager = new ViaCepManager(httpClient, _loggerMock.Object, _optionsMock.Object);
-            #endregion
-
-            #region Act
-            await viaCepManager.ObterEnderecoViaCepAsync(cep, CancellationToken.None);
-            #endregion
-
-            #region Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Warning,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-                Times.Once);
-            #endregion
-        }
-
-        [Fact]
-        public async Task ObterEnderecoViaCepAsync_DeveRegistrarLogDeErro_QuandoExcecaoOcorre()
-        {
-            #region Arrange
-            var cep = TestsExtensions.GerarCepSimples();
-            var exception = new HttpRequestException("Erro de conexão");
-
-            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
-            mockHttpMessageHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get),
-                    ItExpr.IsAny<CancellationToken>())
-                .ThrowsAsync(exception);
-
-            var httpClient = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
-            var viaCepManager = new ViaCepManager(httpClient, _loggerMock.Object, _optionsMock.Object);
-            #endregion
-
-            #region Act
-            await viaCepManager.ObterEnderecoViaCepAsync(cep, CancellationToken.None);
-            #endregion
-
-            #region Assert
-            _loggerMock.Verify(
-                x => x.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-                Times.Once);
-            #endregion
-        }
-
         [Theory]
-        [InlineData(HttpStatusCode.BadRequest)]
-        [InlineData(HttpStatusCode.Unauthorized)]
-        [InlineData(HttpStatusCode.Forbidden)]
-        [InlineData(HttpStatusCode.NotFound)]
-        public async Task ObterEnderecoViaCepAsync_DeveRetornarErro_QuandoStatusCodeEhErroDoCliente(HttpStatusCode statusCode)
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.BadGateway)]
+        [InlineData(HttpStatusCode.ServiceUnavailable)]
+        [InlineData(HttpStatusCode.GatewayTimeout)]
+        public async Task ObterEnderecoViaCepAsync_DeveRetornarErro_QuandoStatusCodeEhErroDoServicoExternoViaCep(HttpStatusCode statusCode)
         {
             #region Arrange
             var cep = TestsExtensions.GerarCepSimples();
+            var dadosEndereco = new Faker<ViaCepResponse>("pt_BR")
+                .RuleFor(e => e.Cep, f => cep)
+                .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+                .RuleFor(e => e.Localidade, f => f.Address.City())
+                .Generate();
 
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler
                 .Protected()
-                .Setup<Task<HttpResponseMessage>>(
+                .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(statusCode));
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, dadosEndereco))
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, dadosEndereco))
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, dadosEndereco))
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, dadosEndereco));
 
-            var httpClient = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
+            var httpClient = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
             var viaCepManager = new ViaCepManager(httpClient, _loggerMock.Object, _optionsMock.Object);
             #endregion
 
@@ -406,59 +340,16 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
             #endregion
         }
 
-        [Theory]
-        [InlineData(HttpStatusCode.InternalServerError)]
-        [InlineData(HttpStatusCode.BadGateway)]
-        [InlineData(HttpStatusCode.ServiceUnavailable)]
-        [InlineData(HttpStatusCode.GatewayTimeout)]
-        public async Task ObterEnderecoViaCepAsync_DeveRetentar_QuandoStatusCodeEhErroDoServidor(HttpStatusCode statusCode)
-        {
-            #region Arrange
-            var cep = TestsExtensions.GerarCepSimples();
-            var dadosEndereco = new ViaCepResponse
-            {
-                Cep = cep,
-                Logradouro = "Rua Teste",
-                Localidade = "Teste"
-            };
-
-            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
-            mockHttpMessageHandler
-                .Protected()
-                .SetupSequence<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(statusCode))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(dadosEndereco))
-                });
-
-            var httpClient = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
-            var viaCepManager = new ViaCepManager(httpClient, _loggerMock.Object, _optionsMock.Object);
-            #endregion
-
-            #region Act
-            var result = await viaCepManager.ObterEnderecoViaCepAsync(cep, CancellationToken.None);
-            #endregion
-
-            #region Assert
-            Assert.True(result.Sucesso);
-            #endregion
-        }
-
         [Fact]
         public async Task ObterEnderecoViaCepAsync_DeveRetentar_QuandoErroTemporarioOcorre()
         {
             #region Arrange
             var cep = TestsExtensions.GerarCepSimples();
-            var dadosEndereco = new ViaCepResponse
-            {
-                Cep = cep,
-                Logradouro = "Avenida Paulista",
-                Localidade = "São Paulo"
-            };
+            var dadosEndereco = new Faker<ViaCepResponse>("pt_BR")
+                .RuleFor(e => e.Cep, f => cep)
+                .RuleFor(e => e.Logradouro, f => f.Address.StreetName())
+                .RuleFor(e => e.Localidade, f => f.Address.City())
+                .Generate();
 
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler

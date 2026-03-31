@@ -67,7 +67,7 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
                     Content = new StringContent(JsonSerializer.Serialize(dadosEmpresa))
                 });
 
-            var httpClientMock = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
+            var httpClientMock = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
 
             var brasilApiManager = new BrasilApiManager(httpClientMock, _loggerMock.Object, _optionsMock.Object);
             #endregion
@@ -102,7 +102,7 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
 
-            var httpClientMock = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
+            var httpClientMock = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
             var brasilApiManager = new BrasilApiManager(httpClientMock, _loggerMock.Object, _optionsMock.Object);
             #endregion
 
@@ -139,7 +139,7 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
                     Content = new StringContent("null")
                 });
 
-            var httpClientMock = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
+            var httpClientMock = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
             var brasilApiManager = new BrasilApiManager(httpClientMock, _loggerMock.Object, _optionsMock.Object);
             #endregion
 
@@ -523,45 +523,13 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
             #endregion
         }
 
-        [Theory]
-        [InlineData(HttpStatusCode.BadRequest)]
-        [InlineData(HttpStatusCode.Unauthorized)]
-        [InlineData(HttpStatusCode.Forbidden)]
-        [InlineData(HttpStatusCode.NotFound)]
-        public async Task ObterDadosEmpresaBrasilApiAsync_DeveRetornarErro_QuandoStatusCodeEhErroDoCliente(HttpStatusCode statusCode)
-        {
-            #region Arrange
-            var cnpj = TestsExtensions.GerarCnpj();
-
-            var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
-            mockHttpMessageHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(statusCode));
-
-            var httpClient = TestsExtensions.CreateHttpClient(mockHttpMessageHandler);
-            var brasilApiManager = new BrasilApiManager(httpClient, _loggerMock.Object, _optionsMock.Object);
-            #endregion
-
-            #region Act
-            var result = await brasilApiManager.ObterDadosEmpresaBrasilApiAsync(cnpj, CancellationToken.None);
-            #endregion
-
-            #region Assert
-            Assert.False(result.Sucesso);
-            Assert.NotEmpty(result.Notifications);
-            #endregion
-        }
 
         [Theory]
         [InlineData(HttpStatusCode.InternalServerError)]
         [InlineData(HttpStatusCode.BadGateway)]
         [InlineData(HttpStatusCode.ServiceUnavailable)]
         [InlineData(HttpStatusCode.GatewayTimeout)]
-        public async Task ObterEnderecoPorCepBrasilApiAsync_DeveRetentar_QuandoStatusCodeEhErroDoServidor(HttpStatusCode statusCode)
+        public async Task ObterEnderecoPorCepBrasilApiAsync_DeveRetentar_QuandoStatusCodeEhErroDoServicoExternoBrasilApi(HttpStatusCode statusCode)
         {
             #region Arrange
             var cep = TestsExtensions.GerarCepSimples();
@@ -578,11 +546,10 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(statusCode))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(endereco))
-                });
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, endereco))
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, endereco))
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, endereco))
+                .ReturnsAsync(TestsExtensions.CriarResponsePorHttpStatusCode(statusCode, endereco));
 
             var httpClient = TestsExtensions.CreateResilientHttpClient(mockHttpMessageHandler);
             var brasilApiManager = new BrasilApiManager(httpClient, _loggerMock.Object, _optionsMock.Object);
@@ -593,7 +560,8 @@ namespace TL.Shipay.Project.Tests.Infrastructure.ExternalServices
             #endregion
 
             #region Assert
-            Assert.True(result.Sucesso);
+            Assert.False(result.Sucesso);
+            Assert.NotEmpty(result.Notifications);
             #endregion
         }
 

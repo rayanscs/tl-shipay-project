@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 using TL.Shipay.Project.Infrastructure;
 
 namespace TL.Shipay.Project.Tests.Utils
@@ -61,10 +64,10 @@ namespace TL.Shipay.Project.Tests.Utils
                 RetryCount = 2,
                 RetryDelaySeconds = 2,
                 RetryUseJitter = true,
-                CircuitBreakerFailureRatio = 0.5,
-                CircuitBreakerMinimumThroughput = 3,
-                CircuitBreakerSamplingDuration = 20,
-                CircuitBreakerBreakDuration = 30
+                CircuitBreakerFailureRatio = 0.5,       // Percentual de falhas permitido antes do Circuit Breaker abrir.
+                CircuitBreakerMinimumThroughput = 3,    // Número mínimo de requisições antes do Circuit Breaker começar a monitorar falhas.
+                CircuitBreakerSamplingDuration = 20,    // Período de tempo (em segundos) em que o Circuit Breaker analisa as requisições
+                CircuitBreakerBreakDuration = 10        // Tempo (em segundos) que o circuito fica ABERTO (rejeitando requisições).
             };
 
             var services = new ServiceCollection();
@@ -88,6 +91,74 @@ namespace TL.Shipay.Project.Tests.Utils
             var provider = services.BuildServiceProvider();
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             return factory.CreateClient("resilient");
+        }
+
+        public static HttpResponseMessage CriarResponsePorHttpStatusCode(HttpStatusCode statusCode, object dados)
+        {
+            return statusCode switch
+            {
+                HttpStatusCode.OK => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(dados),
+                        Encoding.UTF8,
+                        "application/json")
+                },
+                HttpStatusCode.NotFound => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Recurso não encontrado" }),
+                        Encoding.UTF8,
+                        "application/json"),
+                    ReasonPhrase = "Not Found"
+                },
+                HttpStatusCode.BadRequest => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Requisição inválida" }),
+                        Encoding.UTF8,
+                        "application/json")
+                },
+                HttpStatusCode.Unauthorized => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Não autorizado" }),
+                        Encoding.UTF8,
+                        "application/json")
+                },
+                HttpStatusCode.BadGateway => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Bad Gateway - Servidor intermediário inválido" }),
+                        Encoding.UTF8,
+                        "application/json"),
+                            ReasonPhrase = "Bad Gateway"
+                },
+                HttpStatusCode.ServiceUnavailable => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Serviço indisponível - Tente novamente mais tarde" }),
+                        Encoding.UTF8,
+                        "application/json"),
+                            ReasonPhrase = "Service Unavailable",
+                            Headers = { { "Retry-After", "1" } }
+                },
+                HttpStatusCode.GatewayTimeout => new HttpResponseMessage(statusCode)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Timeout - Serviço demorou muito para responder" }),
+                        Encoding.UTF8,
+                        "application/json"),
+                            ReasonPhrase = "Gateway Timeout"
+                },
+                _ => new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(new { error = "Erro desconhecido" }),
+                        Encoding.UTF8,
+                        "application/json")
+                }
+            };
         }
     }
 }
