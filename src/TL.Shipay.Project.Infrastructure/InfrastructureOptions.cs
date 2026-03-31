@@ -10,6 +10,8 @@
     {
         public ServicoResilienciaConfig Services { get; set; }
         public int RetryCount { get; set; }
+        public int RetryDelaySeconds { get; set; }
+        public bool RetryUseJitter { get; set; }
         public double CircuitBreakerFailureRatio { get; set; }
         public int CircuitBreakerMinimumThroughput { get; set; }
         public double CircuitBreakerSamplingDuration { get; set; }

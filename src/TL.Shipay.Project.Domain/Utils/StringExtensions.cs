@@ -21,7 +21,7 @@ namespace TL.Shipay.Project.Domain.Utils
             return digitos.Substring(0, 5) + "-" + digitos.Substring(5, 3);
         }
 
-        public static string NormalizaString(string? s)
+        public static string NormalizaString(string? s, bool ehlogradouro = true)
         {
             if (string.IsNullOrWhiteSpace(s)) return string.Empty;
 
@@ -36,7 +36,8 @@ namespace TL.Shipay.Project.Domain.Utils
             }
 
             var normalized = sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant();
-            normalized = RemoverPalavrasReservadasEndereco(normalized);
+
+            if (ehlogradouro) normalized = RemoverPalavrasReservadasEndereco(normalized);
 
             return normalized.Trim();
         }

@@ -1,4 +1,8 @@
-﻿namespace TL.Shipay.Project.Tests.Utils
+﻿using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using TL.Shipay.Project.Infrastructure;
+
+namespace TL.Shipay.Project.Tests.Utils
 {
     public static class TestsExtensions
     {
@@ -46,9 +50,44 @@
             return $"{parte1:D5}-{parte2:D3}";
         }
 
-        public static string GerarCepSimples()
+        public static string GerarCepSimples() => _random.Next(10000000, 99999999).ToString();
+
+        public static HttpClient CreateHttpClient(Mock<HttpMessageHandler> mockHttpMessageHandler) => new HttpClient(mockHttpMessageHandler.Object);
+
+        public static HttpClient CreateResilientHttpClient(Mock<HttpMessageHandler> mockHttpMessageHandler, ResilienciaConfig? config = null)
         {
-            return _random.Next(10000000, 99999999).ToString();
+            var resiliencia = config ?? new ResilienciaConfig
+            {
+                RetryCount = 2,
+                RetryDelaySeconds = 2,
+                RetryUseJitter = true,
+                CircuitBreakerFailureRatio = 0.5,
+                CircuitBreakerMinimumThroughput = 3,
+                CircuitBreakerSamplingDuration = 20,
+                CircuitBreakerBreakDuration = 30
+            };
+
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddHttpClient("resilient")
+                .ConfigurePrimaryHttpMessageHandler(() => mockHttpMessageHandler.Object)
+                .AddStandardResilienceHandler(options =>
+                {
+                    options.Retry.MaxRetryAttempts = resiliencia.RetryCount;
+                    options.Retry.Delay = TimeSpan.FromSeconds(resiliencia.RetryDelaySeconds);
+                    options.Retry.BackoffType = Polly.DelayBackoffType.Constant;
+                    options.Retry.UseJitter = resiliencia.RetryUseJitter;
+                    options.CircuitBreaker.FailureRatio = resiliencia.CircuitBreakerFailureRatio;
+                    options.CircuitBreaker.MinimumThroughput = resiliencia.CircuitBreakerMinimumThroughput;
+                    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(resiliencia.CircuitBreakerSamplingDuration);
+                    options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(resiliencia.CircuitBreakerBreakDuration);
+                    options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+                    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(10);
+                });
+
+            var provider = services.BuildServiceProvider();
+            var factory = provider.GetRequiredService<IHttpClientFactory>();
+            return factory.CreateClient("resilient");
         }
     }
 }

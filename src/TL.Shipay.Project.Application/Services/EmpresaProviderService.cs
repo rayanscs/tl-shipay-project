@@ -104,7 +104,7 @@ namespace TL.Shipay.Project.Application.Services
 
         private async Task<bool> ValidaMatchEnderecosAsync(DadosEmpresa empresa, Endereco endereco)
         {
-            var municipioMatch = string.Equals(StringExtensions.NormalizaString(empresa.Municipio), StringExtensions.NormalizaString(endereco.Cidade), StringComparison.Ordinal);
+            var municipioMatch = string.Equals(StringExtensions.NormalizaString(empresa.Municipio, false), StringExtensions.NormalizaString(endereco.Cidade, false), StringComparison.Ordinal);
             var logradouroMatch = string.Equals(StringExtensions.NormalizaString(empresa.Logradouro), StringExtensions.NormalizaString(endereco.Logradouro), StringComparison.Ordinal);
             return await Task.FromResult(municipioMatch && logradouroMatch);
         }

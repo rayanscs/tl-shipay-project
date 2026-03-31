@@ -42,7 +42,7 @@ namespace TL.Shipay.Project.Tests.Controller.v1
 
             Assert.NotNull(result);
 
-            var okResult = Assert.IsType<OkObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnValue = Assert.IsType<Response>(okResult.Value);
 
             Assert.Equal(response, returnValue);
@@ -69,7 +69,7 @@ namespace TL.Shipay.Project.Tests.Controller.v1
 
             var result = await _controller.PostAsync(request, CancellationToken.None);
 
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
             var returnValue = Assert.IsType<Response>(notFoundResult.Value);
 
             Assert.Equal(response, returnValue);

@@ -7,6 +7,7 @@
         BrasilApiNotFound,
         BrasilApiCepError,
         BrasilApiExceptionError,
+        BrasilApiTimeoutError,
         ViaCepError,
         ViaCepNotFound,
         ViaCepExceptionError,
