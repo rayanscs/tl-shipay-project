@@ -1,7 +1,10 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 using TL.Shipay.Project.Api.Extensions;
 using TL.Shipay.Project.Application.Filters;
 using TL.Shipay.Project.Application.Validators;
@@ -11,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<ApiManagerUrlOptions>(builder.Configuration.GetSection("ApiManagerUrlOptions"));
 builder.Services.Configure<InfrastructureOptions>(builder.Configuration.GetSection("InfrastructureOptions"));
+builder.Services.Configure<Jwt>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddAppServices();
 builder.Services.AddServices();
@@ -35,6 +39,8 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 
     options.ExampleFilters();
+
+
 });
 
 builder.Services.AddApiVersioning(options =>
@@ -52,6 +58,8 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+builder.Services.AddConfigAuthenticationApi(builder.Configuration);
 
 var app = builder.Build();
 
@@ -75,6 +83,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

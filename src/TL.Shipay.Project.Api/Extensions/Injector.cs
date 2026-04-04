@@ -1,4 +1,7 @@
-﻿using TL.Shipay.Project.Api.AppService.v1;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using TL.Shipay.Project.Api.AppService.v1;
 using TL.Shipay.Project.Api.AppService.v1.Interfaces;
 using TL.Shipay.Project.Application.Mappings;
 using TL.Shipay.Project.Application.Services;
@@ -19,12 +22,14 @@ namespace TL.Shipay.Project.Api.Extensions
 
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
+            services.AddScoped<IAuthAppService, AuthAppService>();
             services.AddScoped<IClienteAppService, ClienteAppService>();
             return services;
         }
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmpresaProviderService, EmpresaProviderService>();
             return services;
         }
@@ -37,6 +42,50 @@ namespace TL.Shipay.Project.Api.Extensions
                 mapperConfigurationExpression.AddProfile(typeof(EnderecoBrasilApiMappings));
                 mapperConfigurationExpression.AddProfile(typeof(EnderecoViaCepMappings));
             });
+            return services;
+        }
+
+        public static IServiceCollection AddConfigAuthenticationApi(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtSettings = configuration.GetSection("Jwt");
+            var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero, // Sem margem de erro
+
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+
+                // Tratamento de eventos de autenticação (opcional)
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"Falha na autenticação: {context.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine("Token validado com sucesso");
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+            services.AddAuthorization();
             return services;
         }
     }
