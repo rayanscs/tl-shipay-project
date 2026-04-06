@@ -11,9 +11,4 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DependencyInjection\" />
-    <Folder Include="LogConfig\" />
-  </ItemGroup>
-
 </Project>

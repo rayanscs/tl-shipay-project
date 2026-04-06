@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/1 - Presentation/">
     <Project Path="src/TL.Shipay.Project.Api/TL.Shipay.Project.Api.csproj" />
+    <Project Path="src/TL.Shipay.Project.LogListener/TL.Shipay.Project.LogListener.csproj" Id="475644c8-15a4-4844-9ccc-ebd6913fa0fe" />
   </Folder>
   <Folder Name="/2 - Application/">
     <Project Path="src/TL.Shipay.Project.Application/TL.Shipay.Project.Application.csproj" Id="a36d8f95-e8f7-4e08-bf0c-b17278c1b512">
