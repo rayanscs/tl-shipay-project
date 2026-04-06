@@ -12,7 +12,7 @@ Demonstrar implementação de boas práticas e padrões de desenvolvimento em .N
 - **Validação de CNPJ Alfanumérico** - Validação segura de CNPJ com restrição até junho/2026
 - **Resiliência**: Microsoft.Http.Resilience (Retry Pattern, Circuit Breaker Pattern)
 - **AutoMapper** - Mapeamento automático e seguro entre objetos de tipos diferentes
--  **Log** - Registros de execução da aplicação
+-  **Log** - Registros de execução da aplicação usando Serilog.
 - **Generic Response** - Padronização de objeto percorrente em toda a aplicação
 - **Notification Pattern** - Padronização de mensagens de retorno informativo a UI
 - **Http** - Native HttpClient Core
@@ -33,12 +33,14 @@ Demonstrar implementação de boas práticas e padrões de desenvolvimento em .N
   - Moq
   - AutoFixture
   - Coverlet Collector
+-  **Log** - Serilog.
  
 ## Estrutura do Projeto
 ```
 tl-shipay-project/
 ├── src/
 │   ├── TL.Shipay.Project.API/             # Mostra o sistema para o mundo
+│   ├── TL.Shipay.Project.LogListener/     # Aplicação apartada que escreve o arquivo de log em async
 │   ├── TL.Shipay.Project.Application/     # Usa as regras do domínio
 │   ├── TL.Shipay.Project.Domain/          # Núcleo da aplicação
 │   └── TL.Shipay.Project.Infrastructure/  # Conecta o sistema ao mundo real
@@ -46,6 +48,7 @@ tl-shipay-project/
 │   └── Shipay.Tests/                      # Testes unitários
 └── README.md
 ```
+- arquivos de logs em TL.Shipay.Project.LogListener\bin\Debug\net8.0\logs
 
 ## 🚀 Como Começar
 
